@@ -1,0 +1,81 @@
+# There is a built-in micro proxy that will host the webui and REST API all on 
+# one port (this is called the "Single HTTP Frontend") and means you just need 
+# one open port in the container/firewalls/etc. 
+#
+# Listen on all addresses available, port 1337
+listenAddressSingleHTTPFrontend: 0.0.0.0:1337 
+
+# Choose from INFO (default), WARN and DEBUG
+logLevel: "INFO"
+
+# Actions (buttons) to show up on the WebUI:
+actions:   
+- title: NordVPN AUTO
+  shell: /usr/bin/ovpn/connect.sh
+  icon: '<img src = "https://cdn3.iconfinder.com/data/icons/network-68/64/speed-internet-fast-network-512.png" width = "48px"/>'
+  timeout: 120
+
+- title: NordVPN DE
+  shell: /usr/bin/ovpn/connect.sh de
+  icon: '<img src = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Flag_of_Germany.svg/134px-Flag_of_Germany.svg.png" width = "48px"/>'
+  timeout: 120
+
+- title: NordVPN AT
+  shell: /usr/bin/ovpn/connect.sh at
+  icon: '<img src = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Flag_of_Austria.svg/120px-Flag_of_Austria.svg.png" width = "48px"/>'
+  timeout: 120
+
+- title: NordVPN NL
+  shell: /usr/bin/ovpn/connect.sh nl
+  icon: '<img src = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Flag_of_the_Netherlands.svg/200px-Flag_of_the_Netherlands.svg.png" width = "48px"/>'
+  timeout: 120
+
+- title: NordVPN CH
+  shell: /usr/bin/ovpn/connect.sh ch
+  icon: '<img src = "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Flag_of_Switzerland.svg/80px-Flag_of_Switzerland.svg.png" width = "48px"/>'
+  timeout: 120
+
+- title: NordVPN UK
+  shell: /usr/bin/ovpn/connect.sh gb
+  icon: '<img src = "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Flag_of_England.svg/200px-Flag_of_England.svg.png" width = "48px"/>'
+  timeout: 120
+
+- title: NordVPN US
+  shell: /usr/bin/ovpn/connect.sh us
+  icon: '<img src = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Flag_of_the_United_States.svg/200px-Flag_of_the_United_States.svg.png" width = "48px"/>'
+  timeout: 120
+
+- title: NordVPN Country ?
+  shell: /usr/bin/ovpn/connect.sh {{ cc }}
+  icon: '<img src = "https://img.icons8.com/nolan/452/nordvpn.png" width = "48px"/>'
+  timeout: 120
+  arguments:
+    - name: cc
+      title: countrycode
+      type: ascii_identifier
+      default: de
+
+- title: NordVPN Server ?
+  shell: /usr/bin/ovpn/connect_server.sh {{ se }}
+  icon: '<img src = "https://cdn2.iconfinder.com/data/icons/whcompare-isometric-web-hosting-servers/50/secure-server-512.png" width = "48px"/>'
+  timeout: 120
+  arguments:
+    - name: se
+      title: server
+      type: ascii_identifier
+      default: at119
+
+- title: Update VPN Stats
+  shell: /usr/bin/ovpn/health.sh > /var/www/html/rpistatsvpn.txt
+  icon: '<img src = "https://cdn4.iconfinder.com/data/icons/network-technology-12/32/network_connection_status_level_signal_strenght_max-512.png" width = "48px"/>'
+  timeout: 120
+
+- title: Pihole Update Blocklists
+  shell: pihole -g
+  icon: '<img src = "http://www.iconshock.com/img_vista/PLASTICXP/mail/jpg/blacklist_icon.jpg" width = "48px"/>'
+  timeout: 180
+
+- title: Pihole DNS Restart
+  shell: pihole restartdns
+  icon: '<img src = "https://cdn.iconscout.com/icon/premium/png-256-thumb/dns-9-570083.png" width = "48px"/>'
+  timeout: 120
