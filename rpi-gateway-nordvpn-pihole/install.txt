@@ -1,0 +1,218 @@
+# Update System
+
+sudo -i
+
+apt update && apt dist-upgrade -y && apt autoremove -y && apt autoclean -y
+reboot
+
+
+# Install Pihole
+
+sudo -i
+
+curl -sSL https://install.pi-hole.net | bash
+	Important setup parameter, for the rest use default:
+	Set static IP using current values: YES
+
+- Set password:
+  pihole -a -p
+
+- Edit FTL config:
+  nano /etc/pihole/pihole-FTL.conf
+	PRIVACYLEVEL=0
+	MAXDBDAYS=7
+	DBINTERVAL=60
+	RATE_LIMIT=0/0
+	BLOCK_ICLOUD_PR=false
+  Ctrl+o > Enter > Ctrl+x
+
+- Use NordVPN DNS, listen to all interfaces. Edit the following lines:
+  nano /etc/pihole/setupVars.conf
+	PIHOLE_DNS_1=103.86.96.100
+	PIHOLE_DNS_2=103.86.99.100
+	DNSMASQ_LISTENING=all
+  Ctrl+o > Enter > Ctrl+x
+  
+  service pihole-FTL restart
+
+- Use Pihole as local DNS, edit the last line in the dhcpcd config:
+  nano /etc/dhcpcd.conf
+	static domain_name_servers=127.0.0.1
+  Ctrl+o > Enter > Ctrl+x
+  
+  service dhcpcd restart
+
+- Import Pihole settings (Adlists, ...)
+  Download the following file to your desktop:
+	https://github.com/hagezi/files/raw/main/rpi-gateway-nordvpn-pihole/pi-hole-teleporter.tar.gz
+
+  Call the pihole webinterface:
+	http://#YOUR_RASPBERRY_IP#/admin/settings.php?tab=teleporter
+  
+  Restore teleporter file:
+	Browse > Select downloaded file pi-hole-teleporter.tar.gz
+	Restore > Close
+
+- Update Pihole gravity
+  pihole -g
+
+- Test DNS resolution
+  dig nordvpn.com
+
+- Configure daily blocklist updates
+  crontab -e
+	Add the following lines to update blocklists daily at 05:30:
+	  30 05 * * * /usr/local/bin/pihole -g 2>&1
+	Ctrl+o > Enter > Ctrl+x
+
+
+# Install VPN-Gateway
+
+- Enable packet forwarding for IPv4
+  nano /etc/sysctl.conf
+	uncomment the line: net.ipv4.ip_forward=1
+  Ctrl+o > Enter > Ctrl+x
+
+  sysctl -p /etc/sysctl.conf
+
+- Install packages
+  apt install openvpn jq iptables iptables-persistent -y
+	Important iptables setup parameter:
+	Current iptables rules can be saved ...: NO!
+
+- Download and install HaGeZi's VPN-Package
+  
+  mkdir /usr/bin/ovpn
+  cd /usr/bin/ovpn	  
+
+  wget https://github.com/hagezi/files/raw/main/rpi-gateway-nordvpn-pihole/usr-bin-ovpn.zip
+  unzip usr-bin-ovpn.zip
+  rm usr-bin-ovpn.zip
+
+  chmod +x *.sh
+  chmod +x run 
+  
+  - deposit your nordvpn credentials
+    nano login.txt
+	  USERNAME="YOUR_NORDVPNACCOUNT_EMAIL_ADDRESS"
+	  PASSWORT="YOUR_NORDVPNACCOUNT_PASSWORD"	  
+    Ctrl+o > Enter > Ctrl+x
+    
+    chmod 600 login.txt
+  
+  - edit the country where you want to connect to vpn
+    nano country.txt
+	  COUNTRY=at
+    Ctrl+o > Enter > Ctrl+x
+
+- Edit configuration
+
+  nano variables.txt
+
+  - edit local network, CIDR of your local network:
+	  LOCAL_NETWORK="192.168.178.0/24"
+
+  - edit IPs for downloads.nordcdn.com, get them with "dig downloads.nordcdn.com":
+	  NORDVPN_CDN1=104.17.167.30
+	  NORDVPN_CDN2=104.17.168.30
+
+  - edit IPs for nordvpn.com, get them with "dig nordvpn.com":
+	  NORDVPN_COM1=104.17.49.74
+	  NORDVPN_COM2=104.17.50.74	
+
+  Ctrl+o > Enter > Ctrl+x
+
+- Install and start VPN service  
+  
+  mv vpngateway.service /etc/systemd/system/
+  systemctl daemon-reload 
+  systemctl enable vpngateway.service
+  service vpngateway start
+
+- Check VPN health
+
+  ./health.sh
+
+- Cyclic generation of VPN health/statistic report
+  
+  crontab -e
+
+  - to update health stats on webserver every 15 minutes, add
+    */15 * * * * /usr/bin/ovpn/health.sh > /var/www/html/rpistatsvpn.txt 2>&1
+
+  Ctrl+o > Enter > Ctrl+x
+
+  *** Info ***
+  You can access the statistics via the URL http://#YOUR_RASPBERRY_IP#/rpistatsvpn.txt.
+
+- Reboot
+
+  reboot
+
+
+# Install Proxy (Privoxy)
+
+sudo -i
+
+apt-get install privoxy -y
+
+nano /etc/privoxy/config
+ - replace:
+	listen-address  127.0.0.1:8118
+	listen-address  [::1]:8118
+ - with:
+	listen-address :8118
+  Ctrl+o > Enter > Ctrl+x
+
+service privoxy restart
+
+*** Info ***
+You can reach the proxy via the IP #YOUR_RASPBERRY_IP# and the port 8118. 
+To use the proxy you can use e.g. the browser plugin SwitchyOmega. To prevent 
+ip leaking in the browser through WebRTC, also install an extension that 
+blocks WebRTC, e.g. WebRTC Leak Shield.
+The proxy can also be used as a proxy for torrent clients.
+
+
+# Install the admin VPN/DNS web interface
+
+- Install OliveTin
+
+  wget https://github.com/OliveTin/OliveTin/releases/download/2022-04-07/OliveTin_2022-04-07_linux_arm64.deb
+  dpkg -i OliveTin_2022-04-07_linux_arm64.deb
+
+- Update config
+
+  wget -O /etc/OliveTin/config.yaml https://raw.githubusercontent.com/hagezi/files/main/rpi-gateway-nordvpn-pihole/config.yaml
+
+- Enable service
+
+  systemctl enable --now OliveTin
+
+- Test Webinterface
+
+  http://#YOUR_RASPBERRY_IP#:1337
+
+# FINISHED!
+
+
+*** OVERVIEW ***
+
+Webinterface Pihole:
+http://#YOUR_RASPBERRY_IP#/admin/index.php
+
+Webinterface to change country, specific server or to reconnect (switch to fastest server):
+http://#YOUR_RASPBERRY_IP#:1337
+
+VPN Statistics/Status:
+http://#YOUR_RASPBERRY_IP#/rpistatsvpn.txt
+
+VPN Proxy:
+#YOUR_RASPBERRY_IP#:8118
+
+Proxy Service:
+sudo service privoxy start | stop | restart | status
+
+VPN Service:
+sudo service vpngateway start | stop | restart | status
+
