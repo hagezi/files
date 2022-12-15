@@ -1,0 +1,37 @@
+! Black
+
+! TikTok Fingerprinting
+/.*(analytics|frontier|gecko|mon|log|mssdk|mcs|pitaya).*\.(tiktok(v|cdn)?|byteoversea)\.com$/
+
+! Analytics - Metrics - Telemetry
+/^(s|[a-z0-9\-]*\-)?analytics?(\-[a-z0-9\-]*)?\.[a-z0-9\-]*\./
+/^(s|[a-z0-9\-]*\-)?metrics?(\-[a-z0-9\-]*)?\.[a-z0-9\-]*\./
+/^([a-z0-9\-]*\-)?telemetry(\-[a-z0-9\-]*)?\.[a-z0-9\-]*\./
+
+! Tracking
+/^(error|g|bug|[a-z0-9\-]*\-)?track(er|ing)?(\-[a-z0-9\-]*)?\.[a-z0-9\-]*\./
+/^trk\.[a-z0-9\-]*\./
+
+! Sentry
+/^sentry\.[a-z0-9\-]*\./
+
+! Bypass
+||dns.google^
+||dns.google.com^
+||google-public-dns*.google.com^
+||dns*.cloudflare.net^
+||dns*.cloudflare.com^
+||cloudflare-dns.com^
+||cloudflare-gateway.com^
+||dns*.quad9.net^
+
+! White
+
+! Allow Referral Links
+@@/^clicks?\.[a-z0-9\-]*\./
+@@/^e?mails?(\-[a-z0-9]*)?\.[a-z0-9\-]*\./
+@@/^go(to)?\.[a-z0-9\-]*\./
+@@/^(news)?links?\.[a-z0-9\-]*\./
+@@/^redirect\.[a-z0-9\-]*\./
+@@/^target\.[a-z0-9\-]*\./
+@@/^open\.[a-z0-9\-]*\./
