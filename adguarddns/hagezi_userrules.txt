@@ -1,7 +1,41 @@
-! Black
+! Abuse TLDs
+
+|*.agency^$denyallow=battlefield.agency|shortcut.agency
+|*.beauty^$denyallow=vipbj.beauty
+|*.bid^
+|*.cf^$denyallow=google.cf|rths.cf|voitures.cf|assembleenationale-rca.cf|cps-rca.cf|acap.cf|miraculousladybug.cf|scrat.cf
+|*.cfd^
+!|*.cn^$denyallow=google.cn|www.chinadaily.com.cn|360.cn|china.com.cn|china.org.cn|rednet.cn|amazon.cn|alexa.cn|sina.com.cn
+|*.degree^$denyallow=opf.degree|three60.degree
+|*.discount^
+|*.fit^$denyallow=appetit.fit|clubb.fit|pridegym.fit|justget.fit
+|*.fun^$denyallow=libgen.fun|gaggle.fun|neal.fun|bestgore.fun|20anime.fun
+|*.ga^$denyallow=google.ga|filtri-dns.ga|dgdi.ga|voitures.ga|economie-gabon.ga|9191.ga|animevsub.ga
+|*.gdn^
+|*.gq^$denyallow=deimos.gq|inege.gq|tvgelive.gq|comprarcarros.gq
+!|*.in^$denyallow=google.co.in
+|*.live^
+|*.loan^
+|*.loans^
+|*.ml^$denyallow=google.ml|mobili.ml|melody.ml|dcod.ml|info-matin.ml|amap.ml|mastodon.ml|worproject.ml|nothingprivate.ml|lingva.ml|lemmy.ml|bittor.ml|noic.ml|beatbump.ml|gymlibrary.ml|animevsub.ml|prompt.ml|biblioreads.ml
+|*.monster^$denyallow=egybest.monster|yts.monster|cloudcdn.monster|fedi.monster
+|*.online^$denyallow=ero-labs.online|amedia.online|allhen.online|chainsaw-man-manga.online|manga1st.online
+|*.ooo^
+|*.pw^$denyallow=libgen.pw|petridish.pw|palaugov.pw|dpc.pw|zikrap.pw|demonoid.pw|bittor.pw|buttercup.pw|rezka.pw|darkcrystal.pw|xor.pw|fullhdfilmizlesene.pw|b00k.pw|gopass.pw|vost.pw
+|*.quest^$denyallow=0x00.quest|prednisonetab.quest
+!|*.ru^$denyallow=google.ru|aliexpress.ru|yandex.ru|dzen.ru
+|*.sbs^
+|*.site^$denyallow=business.site|anitube.site|wuxiaworld.site|notube.site|fmoviesto.site|secreto.site|metrolagu.site|cdmstudy.site
+|*.surf^$denyallow=surfstation.surf|kayaking.surf|quran.surf|s-wings.surf
+|*.tk^$denyallow=coolcmd.tk|budterence.tk|google.tk|transportnews.tk|c0d3c.tk|anonytext.tk|tokelau-info.tk|fakaofo.tk|loljp-wiki.tk|ninetail.tk|goshujin.tk|graph.tk|dls2.pokeacer.tk|nolfrevival.tk|coppersurfer.tk|restricted-functions.tk|bstweaker.tk|nbd-media.tk|glypx-pakhsh-nakon.tk|gotofap.tk|somepythonthings.tk
+|*.top^$denyallow=corriente.top|gdtot.top|nicenature.top|reminder.top|magocoro.top|castlevania.top|suiten.top|shucks.top|1stream.top|ambr.top|techblog.top|changlam10.top|changlam11.top|pdcdn1.top|mastodon.top|pressplay.top
+|*.zone^$denyallow=typinggames.zone|martech.zone|kinogo.zone|kidtopia.zone|itsm.zone
+
+! Punycode TLDs
+/(^|\.)xn--.*$/
 
 ! TikTok Fingerprinting
-/.*(analytics|frontier|gecko|mon|log|mssdk|mcs|pitaya).*\.(tiktok(v|cdn)?|byteoversea)\.com$/
+/.*(analytics|frontier|gecko|mon|log|mssdk|mcs|pitaya).*\.(tiktok(v|cdn)?|byteoversea|snssdk)\.com$/
 
 ! Analytics - Metrics - Telemetry
 /^(s|[a-z0-9\-]*\-)?analytics?(\-[a-z0-9\-]*)?\.[a-z0-9\-]*\./
@@ -15,6 +49,9 @@
 ! Sentry
 /^sentry\.[a-z0-9\-]*\./
 
+! Clarity
+/^clarity\.[a-z0-9\-]*\./
+
 ! Bypass
 ||dns.google^
 ||dns.google.com^
@@ -23,7 +60,13 @@
 ||dns*.cloudflare.com^
 ||cloudflare-dns.com^
 ||cloudflare-gateway.com^
+||one.one.one.one^
 ||dns*.quad9.net^
+||dns*.opendns.com^
+||doh*.opendns.com^
+||resolver*.opendns.com^
+||dns*.umbrella.com^
+||doh*.umbrella.com^
 
 ! White
 
