@@ -5,7 +5,7 @@ on:
     paths:
       # Run workflow on every push
       # only if a file within the specified paths has been changed:
-      - '*.sh'
+      - '**/*.sh'
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
