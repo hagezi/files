@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# ---
 # Script to export parts of the PiHole query log to a text file.
 #
 # The following is exported:
@@ -17,11 +18,7 @@
 #
 # Usage:
 # ./exportPiholeQueryLog.sh OUPTPUTDIR (e.g. /git/dns-data-collection/userdata) DBPATH (optional! e.g. /etc/pihole/pihole-FTL.db)
-
-if [ "$(id -u)" != "0" ]; then
-  echo "The script must be executed with root rights!"
-  exit 1
-fi
+# ---
 
 output=$1
 if [ -z "$1" ]; then
