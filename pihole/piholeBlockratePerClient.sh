@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# ---
+# Script to gather some informations about the blockrate per client/IP from PiHole FTL-Database.
+#
+# The script requires the following package installed:
+# sudo apt install sqlite3
+#
+# Usage:
+# ./piholeBlockratePerClient.sh DBPATH (optional! e.g. /etc/pihole/pihole-FTL.db)
+# ---
+
 if [ -z "$1" ]; then
   echo "No pi-hole FTL database specified! e.g. /etc/pihole/pihole-FTL.db"
   exit 1
