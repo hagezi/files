@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Description : Exports the domains blocked by AdGuard Home with the number of blockings.
 # Parameter $1: AdGuard Home workdir data directory in which the querylog.json is located (sudo find / -name querylog.json)
 # Example: ./adguardBlocked.sh docker/adguardhome/workdir/data/
