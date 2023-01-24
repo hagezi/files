@@ -45,11 +45,11 @@ sql="SELECT \
  client AS ip, client_by_id.name AS clientname,
  SUM(count) FILTER (WHERE flag = 'B') AS blocked,
  SUM(count) FILTER (WHERE flag = 'A') AS allowed,
- CEILING(
- (SUM(count) FILTER (WHERE flag = 'B')*100)
+ ROUND(
+ (1.0 * SUM(count) FILTER (WHERE flag = 'B') * 100)
  /
- (SUM(count) FILTER (WHERE flag = 'A')+SUM(count) FILTER (WHERE flag = 'B'))
- ) AS rate
+ (1.0 * SUM(count) FILTER (WHERE flag = 'A') + 1.0 * SUM(count) FILTER (WHERE flag = 'B'))
+ ,2) AS rate
 FROM
 (
  SELECT * FROM
