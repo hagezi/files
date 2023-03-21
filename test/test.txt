@@ -1,1 +1,2 @@
-google.com
+||firebase*.googleapis.com^
+
