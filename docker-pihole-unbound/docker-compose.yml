@@ -1,0 +1,47 @@
+version: "2"
+
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "67:67/udp"
+      - "80:80/tcp"
+    environment:
+      TZ: 'Europe/Berlin'
+      WEBPASSWORD: 'YOUR_PASSWORD_HERE'
+      PIHOLE_DNS_: "172.28.0.3;172.28.0.3"
+    volumes:
+      - './etc-pihole:/etc/pihole'
+      - './etc-dnsmasq.d:/etc/dnsmasq.d'    
+      - "/etc/hosts:/etc/hosts:ro"
+    cap_add:
+      - NET_ADMIN
+    restart: unless-stopped
+    hostname: pihole
+    networks:
+      default:
+        ipv4_address: 172.28.0.2
+
+  unbound:
+    container_name: pihole-unbound
+    image: klutchell/unbound
+    environment:
+      TZ: 'Europe/Berlin'
+    networks:
+      default:
+        ipv4_address: 172.28.0.3
+    volumes:
+      - './unbound-conf:/etc/unbound/custom.conf.d'
+    restart: unless-stopped
+    hostname: pihole-unbound
+
+networks:
+  default:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
+          gateway: 172.28.0.1
