@@ -32,6 +32,9 @@ if [ -z "$2" ]; then
   echo "No pihole-FTL.db file was specified! Using default of $piholedb"
 fi
 
+# create output-dir if not already existing:
+[ ! -d "$output" ] && mkdir -p "$output"
+
 blockedgrav=$output/blocked.gravity.txt
 blockedblack=$output/blocked.blacklist.txt
 blockedupst=$output/blocked.upstream.txt
