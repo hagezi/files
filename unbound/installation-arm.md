@@ -241,10 +241,38 @@ This keeps the home directory clean after installation.
 - Keep a backup of `/etc/unbound/unbound.conf` before replacing it.
 - Confirm that port `5335` fits the local DNS design, especially when using AdGuard Home, Pi-hole, or another resolver.
 - If Unbound should listen on port `53`, adjust the configuration accordingly.
-- Rebuild Unbound when upstream security updates or new versions are released, because source-built software is not updated through `apt`.
-- Keep a copy of the exact `./configure` command for future upgrades.
 
-## Full command block
+## Update Unbound
+
+Because Unbound was installed from source, it will not receive updates through `apt`. Rebuild it whenever a new upstream release or security patch becomes available.       
+                   
+If you previously installed an older Unbound version using this guide and want to upgrade to a newer source release, repeat steps 4 through 6, then restart the Unbound service:
+
+```bash
+cd $HOME
+
+wget https://nlnetlabs.nl/downloads/unbound/unbound-1.25.0.tar.gz
+tar -xvzf unbound-1.25.0.tar.gz
+cd unbound-1.25.0/
+
+export CFLAGS="-O2"
+./configure --build=aarch64-linux-gnu --prefix=/usr --includedir=\${prefix}/include --infodir=\${prefix}/share/info --libdir=\${prefix}/lib/aarch64-linux-gnu --mandir=\${prefix}/share/man --localstatedir=/var --runstatedir=/run --sysconfdir=/etc --with-chroot-dir= --with-dnstap-socket-path=/run/dnstap.sock --with-libevent --with-libhiredis --with-libnghttp2 --with-pidfile=/run/unbound.pid --with-pythonmodule --with-pyunbound --with-rootkey-file=/var/lib/unbound/root.key --disable-dependency-tracking --disable-flto --disable-maintainer-mode --disable-option-checking --disable-rpath --disable-silent-rules --enable-cachedb --enable-dnstap --enable-subnet --enable-systemd --enable-tfo-client --enable-tfo-server
+make
+sudo make install
+
+sudo unbound-checkconf /etc/unbound/unbound.conf
+sudo systemctl restart unbound
+
+sudo systemctl status unbound
+unbound -V
+
+dig fail01.dnssec.works @127.0.0.1 -p 5335
+dig +ad dnssec.works @127.0.0.1 -p 5335
+
+rm -rf unbound-*
+```
+
+## Full installation command block
 
 ```bash
 cd $HOME
