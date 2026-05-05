@@ -1,4 +1,4 @@
-# Unbound Installation on ARM
+# Unbound Installation (ARM64/AArch64)
 
 This README explains how to install and compile **Unbound 1.25.0** from source on an **ARM64 / AArch64** Debian- or Ubuntu-based system.
 
