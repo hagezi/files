@@ -72,11 +72,6 @@
 @@||ipinfo.io^
 @@||ipapi.is^
 
-! AdShield
-||html-load.com^
-||css-load.com^
-||error-report.com^
-
 ! Tracking
 ||datadome.co^
 
