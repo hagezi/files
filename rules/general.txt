@@ -1,0 +1,83 @@
+! Ads
+/(^|\.)(0x)?(?=[0-9a-f]*[a-f])(?=[0-9a-f]*[0-9])[0-9a-f]{10,64}\.[a-z]{2,}$/
+
+! Popups
+/^94\.242\.247\.[0-9]+$/
+
+! Security
+/(^|\.)[0-9a-fA-F]{8}(-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}\.[a-z]{2,}$/
+|*0-0-0-0*^
+|*qltuh*^
+
+! Typosquatting
+|*app1e*^
+|*faceb00k*^
+|*faceb0ok*^
+|*facebo0k*^
+|*g00gle*^
+|*g0ogle*^
+|*go0gle*^
+|*inslagram*^
+|*lnslagram*^
+|*lnstagram*^
+|*off1ce*^
+|*0ff1ce*^
+|*0ffice*^
+|*tw1tter*^
+|*y0ulube*^
+|*y0utube*^
+|*youlube*^
+
+! Bypass
+! IPFS
+|*ipfs*^
+! Cloudflare
+||cloudflare-dns.com^
+||dns.cloudflare.com^
+||one.one.one.one^
+! Google
+||8888.google^
+||dns.google.com^
+||dns.google^
+||google-public-dns-*.google.com^
+! NXDOMAIN
+||dns-tunnel-check.googlezip.net^$dnsrewrite=NXDOMAIN
+||use-application-dns.net^$dnsrewrite=NXDOMAIN
+||mask.icloud.com^$dnsrewrite=NXDOMAIN
+||mask-h2.icloud.com^$dnsrewrite=NXDOMAIN
+||mask-canary.icloud.com^$dnsrewrite=NXDOMAIN
+||doh.dns.apple.com^$dnsrewrite=NXDOMAIN
+||doh-dns-apple-com.v.aaplimg.com^$dnsrewrite=NXDOMAIN
+||doh.dns.apple.com.v.aaplimg.com^$dnsrewrite=NXDOMAIN
+||home.arpa^$dnsrewrite=NXDOMAIN
+||resolver.arpa^$dnsrewrite=NXDOMAIN
+||service.arpa^$dnsrewrite=NXDOMAIN
+||domain.name^$dnsrewrite=NXDOMAIN
+
+! Tracking
+||*.cdn.optimizely.com^
+
+! Amazon
+||amazon-adsystem.com^
+@@||aax-eu.amazon.de^
+
+! JoyN
+@@||event-collector*.joyn.de^
+@@||heartbeats*.joyn.de^
+
+! Rebind
+@@||fritz.box^
+@@||dns.msftncsi.com^
+
+! AdBlock-Detection
+@@||ast.bild.de^
+@@||cdn.opecloud.com^
+@@||tag.aticdn.net^
+@@||tags*.tiqcdn.com^
+@@||www.asadcdn.com^
+
+! Unblock
+@@||cdn.braze.eu^
+@@||deliveryengine.adswizz.com^
+@@||fscdn.eppo.cloud^
+@@||dd.ubisoft.com^
