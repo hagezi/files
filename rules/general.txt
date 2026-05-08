@@ -65,6 +65,10 @@
 @@||event-collector*.joyn.de^
 @@||heartbeats*.joyn.de^
 
+! Instagram
+! Comments sometimes don't load?
+@@||graph*.instagram.com^
+
 ! Rebind
 @@||fritz.box^
 @@||dns.msftncsi.com^

@@ -83,6 +83,7 @@
 ||star.fallback.c10r.instagram.com^
 ||star-mini-nohsts.c10r.facebook.com^
 ||star-nohsts.c10r.facebook.com^
+||graph*.instagram.com^$important
 
 ! Microsoft Xbox/Windows
 ||client.wns.windows.com^
