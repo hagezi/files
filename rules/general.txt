@@ -47,6 +47,7 @@
 
 ! Hoster CNAMES
 @@||ext-sq.squarespace.com^
+@@||ext-cust.squarespace.com^
 
 ! Tracking
 ||*.cdn.optimizely.com^
