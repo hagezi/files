@@ -43,15 +43,6 @@
 ! NXDOMAIN
 ||dns-tunnel-check.googlezip.net^$dnsrewrite=NXDOMAIN
 ||use-application-dns.net^$dnsrewrite=NXDOMAIN
-||mask.icloud.com^$dnsrewrite=NXDOMAIN
-||mask-h2.icloud.com^$dnsrewrite=NXDOMAIN
-||mask-canary.icloud.com^$dnsrewrite=NXDOMAIN
-||doh.dns.apple.com^$dnsrewrite=NXDOMAIN
-||doh-dns-apple-com.v.aaplimg.com^$dnsrewrite=NXDOMAIN
-||doh.dns.apple.com.v.aaplimg.com^$dnsrewrite=NXDOMAIN
-||home.arpa^$dnsrewrite=NXDOMAIN
-||resolver.arpa^$dnsrewrite=NXDOMAIN
-||service.arpa^$dnsrewrite=NXDOMAIN
 ||domain.name^$dnsrewrite=NXDOMAIN
 
 ! Tracking
