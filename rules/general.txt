@@ -69,10 +69,6 @@
 ! Comments sometimes don't load?
 @@||graph*.instagram.com^
 
-! Rebind
-@@||fritz.box^
-@@||dns.msftncsi.com^
-
 ! AdBlock-Detection
 @@||ast.bild.de^
 @@||cdn.opecloud.com^
