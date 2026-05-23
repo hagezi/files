@@ -45,10 +45,6 @@
 ||use-application-dns.net^$dnsrewrite=NXDOMAIN
 ||domain.name^$dnsrewrite=NXDOMAIN
 
-! Hoster CNAMES
-@@||ext-sq.squarespace.com^
-@@||ext-cust.squarespace.com^
-
 ! Tracking
 ||*.cdn.optimizely.com^
 
