@@ -72,3 +72,4 @@
 @@||deliveryengine.adswizz.com^
 @@||fscdn.eppo.cloud^
 @@||dd.ubisoft.com^
+@@||ddc.paypal.com^
