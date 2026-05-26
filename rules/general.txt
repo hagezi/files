@@ -73,3 +73,4 @@
 @@||fscdn.eppo.cloud^
 @@||dd.ubisoft.com^
 @@||ddc.paypal.com^
+@@||ddbm2.paypal.com^
