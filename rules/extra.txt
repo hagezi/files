@@ -72,9 +72,6 @@
 @@||ipinfo.io^
 @@||ipapi.is^
 
-! Tracking
-||datadome.co^
-
 ! META
 ||star-mini.c10r.facebook.com^
 ||star-mini.fallback.c10r.facebook.com^
