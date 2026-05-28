@@ -44,6 +44,20 @@
 ||dns-tunnel-check.googlezip.net^$dnsrewrite=NXDOMAIN
 ||use-application-dns.net^$dnsrewrite=NXDOMAIN
 ||domain.name^$dnsrewrite=NXDOMAIN
+! Allow 
+@@||adguard-dns.com^
+@@||controld.com^
+@@||dnsbunker.org^
+@@||hagezi.org^
+@@||joindns4.eu^
+@@||mullvad.net^
+@@||nextdns.io^
+@@||opendns.com^
+@@||quad9.net^
+
+! IPinfo
+@@||ipinfo.io^
+@@||ipapi.is^
 
 ! Tracking
 ||*.cdn.optimizely.com^
