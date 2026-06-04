@@ -561,6 +561,7 @@
 ||2531-coinabase.com^
 ||25369.pet^
 ||25575.com^
+||256416-coinbase.com^
 ||257labs.com^
 ||265432103.am.coinbase.cm^
 ||2664157451525.netlify.app^
@@ -729,6 +730,7 @@
 ||46a28e92.bfhjbfhjfh.pages.dev^
 ||46i9hvpjms.intesa-850aurum.it^
 ||4755a0c2.chfhfutehebcdh.pages.dev^
+||4800ff.cc^
 ||4823848-coinbase.com^
 ||4827193-crypto.com^
 ||48410b52.formartt.pages.dev^
@@ -1879,6 +1881,7 @@
 ||addusdsteam.com^
 ||addvice.store^
 ||addvip-ada.com^
+||addyrus.com^
 ||aden.exchange^
 ||aden.finance^
 ||adene.io^
@@ -4516,6 +4519,7 @@
 ||app-atomic.co.com^
 ||app-avantisfi.xyz^
 ||app-b14g.xyz^
+||app-babylonlabsvote.xyz^
 ||app-based.one^
 ||app-basedbrett.pages.dev^
 ||app-beam.com^
@@ -6366,6 +6370,7 @@
 ||asterdexresolution.pages.dev^
 ||asterdexresolve.pages.dev^
 ||asterdexrpc.pages.dev^
+||asterdexvote.today^
 ||asterdez.com^
 ||asterdiex.com^
 ||asterdrop.net^
@@ -12858,6 +12863,7 @@
 ||castrocvv.me^
 ||castrocvv.org^
 ||castroecarrasco.com.br^
+||castuswealth.com^
 ||casupdate.live^
 ||casvax.com^
 ||caswex.com^
@@ -14359,6 +14365,7 @@
 ||claim-t3rn.pages.dev^
 ||claim-talus.org^
 ||claim-tari.org^
+||claim-tea.xyz^
 ||claim-tectum.org^
 ||claim-telcoin.network^
 ||claim-tensor.pages.dev^
@@ -19541,6 +19548,7 @@
 ||darkmattertor.com^
 ||darkmatterurls.com^
 ||darkmedik.top^
+||darkmode.study^
 ||darknet-blackops.net^
 ||darknet-kraken-site-com.pages.dev^
 ||darknet-kraken.cc^
@@ -19549,10 +19557,13 @@
 ||darknet-news.com^
 ||darknet-official.app^
 ||darknet-torzon.org^
+||darknet.wiki^
 ||darknetaggregator.cc^
 ||darknetbible.info^
 ||darknetfaq.com^
+||darknetindex.com^
 ||darknetking.com^
+||darknetlinks.co^
 ||darknetmarket.nexus^
 ||darknetmarket.store^
 ||darknetmarketplace.online^
@@ -19798,7 +19809,9 @@
 ||datifee.site^
 ||datln.ru^
 ||daun.bet^
+||daunt.to^
 ||dauntlink.org^
+||daunty.link^
 ||daveblocher.info^
 ||daveridsa.fwh.is^
 ||daveshotchiicken.digital^
@@ -21296,11 +21309,13 @@
 ||dipodrop.com^
 ||dipsersrl.com^
 ||diqodrop.com^
+||direc5723523.pro^
 ||direct-auth.org^
 ||direct-dashboard.com^
 ||direct-kredits.com^
 ||direct-login-update.webflow.io^
 ||direct-trust-wallet.com^
+||direct5723522.pro^
 ||directcall.gr^
 ||direction-xyc.surge.sh^
 ||directnaga-01.pages.dev^
@@ -21565,6 +21580,7 @@
 ||dnax.ai-cryptolist.net^
 ||dnaxx-ld.nxtxle.biz.id^
 ||dnaz-pylaterind.amormarch.biz.id^
+||dnffail.com^
 ||dnfme.fail^
 ||dnizinbanksii.duckdns.org^
 ||dns-suiteapp.wixstudio.com^
@@ -21809,6 +21825,7 @@
 ||docu-sign-firmar.vercel.app^
 ||docu-sign-rho.vercel.app^
 ||docu-sign.app^
+||docu5723531.pro^
 ||doculico.com^
 ||document-printr.money^
 ||document.dropcloud.it^
@@ -22696,6 +22713,7 @@
 ||dss-hw-scan.coinbase.com.lc^
 ||dstp-ledgr.pages.dev^
 ||dstw.cc^
+||dsunt.link^
 ||dsuzkcy7hkxomdsuzkcy7hkxom.cok.influidz.com^
 ||dsuzkcy7hkxomdsuzkcy7hkxomdsuzkcy7hkxom.cok.influidz.com^
 ||dsuzkcy7hkxomdsuzkcy7hkxomdsuzkcy7hkxomdsuzkcy7hkxom.cok.influidz.com^
@@ -26390,6 +26408,8 @@
 ||ext-exxodus.wixstudio.com^
 ||ext-meta-auth-io.pages.dev^
 ||ext-phntom-io.framer.media^
+||ext5723518.pro^
+||ext5723541.pro^
 ||extcoinbs-help.gitbook.io^
 ||extecoinbasecom.pages.dev^
 ||exteensioncuoinbase.webflow.io^
@@ -27692,6 +27712,7 @@
 ||firelaunch.dev^
 ||firelight-fundraising.com^
 ||firelight-liquidity.app^
+||firelight-votes.xyz^
 ||firelightdesktopinstaller.icu^
 ||firelighteligibility.info^
 ||firelightfinance-app.com^
@@ -31144,6 +31165,7 @@
 ||grupoidesign.com.br^
 ||grupomundo.com.py^
 ||grupoolampanama.com^
+||grv5723536.pro^
 ||grvt.io-ref.lat^
 ||grwiucl4iyt1cv1.i8vipjili.com^
 ||grzbietluxeris-invest.com^
@@ -34913,6 +34935,7 @@
 ||info.fast-shipping.it^
 ||info.kidsroboticsbkk.com^
 ||info.remote-otp.com^
+||info5723507.pro^
 ||infoakhirtahun34.blogspot.com^
 ||infobase.help^
 ||infobase365.online^
@@ -45731,6 +45754,7 @@
 ||lumcas.com^
 ||lume-project.com^
 ||lumen-hollow.pages.dev^
+||lumen-perch.com^
 ||lumen-web84d7.pages.dev^
 ||lumenlio.pages.dev^
 ||lumenoingrid.digital^
@@ -50370,6 +50394,7 @@
 ||moonwellapp-vote.xyz^
 ||moonwelll.com^
 ||moonwellvote-app.today^
+||moonwellvote.life^
 ||moonwhisk-lander.pages.dev^
 ||moonxbet.com^
 ||moonxbit.com^
@@ -50481,6 +50506,7 @@
 ||movemoney-vote.xyz^
 ||movemoney-voteapp.xyz^
 ||movemoney.today^
+||movemoneyvote-app.life^
 ||movemoneyvote.top^
 ||movequest-inventory.pages.dev^
 ||movequest-sync.pages.dev^
@@ -53273,6 +53299,7 @@
 ||obelisknodedao.com^
 ||objected-x.com^
 ||objkt-cloud.io^
+||oblg5723526.pro^
 ||obmencashx.com^
 ||obmify.co^
 ||obnleu24.click^
@@ -53618,6 +53645,7 @@
 ||oinb-ase.com^
 ||oinbs-extinsenon.webflow.io^
 ||oincoinkulo.webflow.io^
+||oip23-desk.com^
 ||oip23-vote.com^
 ||oiw-wahst5pp.com^
 ||ojajt-niea-7v4f.c-7jw91027.workers.dev^
@@ -54049,6 +54077,7 @@
 ||oniontaxi.com^
 ||oniontorzon.app^
 ||oniontorzon.store^
+||onionurl.xyz^
 ||onipotentes.club^
 ||onivx.com^
 ||onlin-live-ledgr.pages.dev^
@@ -55314,6 +55343,7 @@
 ||panteraprime.com^
 ||panther-guard.web.app^
 ||panther-ultra-nexus.vercel.app^
+||panzerdogs.io^
 ||papabagfactory.com^
 ||papamurphus.com^
 ||papaya-moonbeam-f9b9d3.netlify.app^
@@ -62787,6 +62817,7 @@
 ||satumenit.m4xwenlagi.org^
 ||saturn-credit.com^
 ||saturnc-credit.com^
+||saturncredit-vote.life^
 ||saturncredit.app^
 ||saturncredit.cam^
 ||saturncredit.com^
@@ -69694,6 +69725,7 @@
 ||support-trezorstart-cdn.square.site^
 ||support-trezr-io-started.created.app^
 ||support-trezuresuties-home.aura.build^
+||support-trust-coinbase.com^
 ||support-ttrezor-com.pages.dev^
 ||support-un-us-exten.pages.dev^
 ||support-up-held-io-wal-let-eng.pages.dev^
@@ -70715,6 +70747,7 @@
 ||tds-ca-dpm-prod-live-frontend.tdse.now.hclsoftware.cloud^
 ||tdsecure-portal.com^
 ||tea-com.pages.dev^
+||tea-enrollment.com^
 ||tea-enrolls.com^
 ||tea-foundations.com^
 ||tea-snapshot.com^
@@ -72351,6 +72384,7 @@
 ||torasonkyo24.shop^
 ||torcat.net^
 ||torcidaemcampo.icu^
+||tordex.to^
 ||tordipiti.com^
 ||tordjman.me^
 ||toreador.io^
@@ -72430,7 +72464,9 @@
 ||torzon-onion-link.info^
 ||torzon-onion.uk^
 ||torzon-store.org^
+||torzon-tzm.com^
 ||torzon.camp^
+||torzon.fail^
 ||torzon.finance^
 ||torzon.name^
 ||torzon.news^
@@ -78937,6 +78973,7 @@
 ||vote-navis.pages.dev^
 ||vote-near.xyz^
 ||vote-neptfinance.xyz^
+||vote-nexus.com^
 ||vote-nillion.xyz^
 ||vote-now.info^
 ||vote-nu.click^
@@ -78974,6 +79011,7 @@
 ||vote-seeker.xyz^
 ||vote-smapocke.pages.dev^
 ||vote-solayer.xyz^
+||vote-solutions.xyz^
 ||vote-solv.pages.dev^
 ||vote-solvprotocol.xyz^
 ||vote-sparkdex.com^
@@ -81614,6 +81652,7 @@
 ||wk.gameboy031.dpdns.org^
 ||wk.quxt.org^
 ||wkindex.jqpyxz.com^
+||wktjdlqvjmempsz.my^
 ||wl-breadtoken.web.app^
 ||wl-usdh-mint.web.app^
 ||wl.tradegame.io^
