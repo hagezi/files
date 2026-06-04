@@ -6568,6 +6568,7 @@
 ||atomic-hub.wixstudio.com^
 ||atomic-my.wixstudio.com^
 ||atomic-new.wixstudio.com^
+||atomic-norge.com^
 ||atomic-wallet.digital^
 ||atomic-wallet.global^
 ||atomic-wallets.pages.dev^
@@ -7517,6 +7518,7 @@
 ||backend-main-proud-frost-1362.fly.dev^
 ||backend.98162d6b-a0c0-4c42-aeb4-bb493bb60d93.suryagharyojna.com^
 ||backend.admin.home.pdwithchloe.com^
+||backend.alibbzyf.com^
 ||backend.rfjvvdemo.suryagharyojna.com^
 ||backlinkbase.com^
 ||backoack.exchange^
@@ -14304,6 +14306,7 @@
 ||claim-rituals-prize.info^
 ||claim-river.icu^
 ||claim-rlusd.top^
+||claim-robux.lovable.app^
 ||claim-royco-airdrop-btc-eth-crypto-binance.pages.dev^
 ||claim-roycoairdrop.pages.dev^
 ||claim-runemilio.pages.dev^
@@ -15297,6 +15300,7 @@
 ||clusterprotocolai.com^
 ||cluuds-trust-tools.pages.dev^
 ||clwade-base.app^
+||cmbhkmanagment.com^
 ||cmbiot.com^
 ||cmc-stellar.bond^
 ||cmc.so^
@@ -22003,6 +22007,7 @@
 ||donation-don-ca.surge.sh^
 ||donbetcasino.games^
 ||dondoobrasil.com^
+||doneld-cc.at^
 ||donetest.pages.dev^
 ||dongshen.space^
 ||donipump.com^
@@ -28801,6 +28806,7 @@
 ||fvbm-qpw3b-3r30-wxcf.pages.dev^
 ||fvck-avatar-opensea-handmade.pages.dev^
 ||fvkufq.cc^
+||fvslonmanagment.com^
 ||fvw0ah.binanceltd.ltd^
 ||fwa.nnh.mybluehost.me^
 ||fwalletfantom.com^
@@ -30613,6 +30619,7 @@
 ||googp.vercel.app^
 ||goojoo.net^
 ||goojp.vercel.app^
+||goolge.web.za^
 ||goompytokencollector.pages.dev^
 ||goonbet.net^
 ||goopentext.com^
@@ -31110,6 +31117,7 @@
 ||growthgeniuss.ltd^
 ||growthlab-x.com^
 ||growthnest-investment.com^
+||growthpennystocknews.com^
 ||growthprofitscontrols.com^
 ||growthtodaysmooth.com^
 ||growthtribe.com^
@@ -31891,6 +31899,7 @@
 ||handshake-ledger.com^
 ||handsome-bob.icu^
 ||handwerk24pro.vip^
+||handycoupons.org^
 ||hangmansol.fun^
 ||hanivex.com^
 ||hannahholding.com^
@@ -32002,6 +32011,7 @@
 ||hastrafi.sbs^
 ||hastraupdate.live^
 ||hat-if.ai-cryptolist.com^
+||haul.style^
 ||haulwavelogistics.com^
 ||hausmeister38.de^
 ||hautemise.com^
@@ -47533,6 +47543,7 @@
 ||merklupdates.live^
 ||merlincrypto.com^
 ||merlinswap-6ib.pages.dev^
+||merlydashboard.uk^
 ||mernpanel.b-cdn.net^
 ||merogamb.com^
 ||meros-grid.pages.dev^
@@ -48003,6 +48014,7 @@
 ||metacade-web.pages.dev^
 ||metacard.cards^
 ||metacard.icu^
+||metacareersjourney.com^
 ||metacareersuite.com^
 ||metacdn.online^
 ||metacdn.tech^
@@ -53122,6 +53134,7 @@
 ||nusaindah.lat^
 ||nusenda.com.co^
 ||nusewin.cc^
+||nussd4afns97w3moj2xj.zhongyinai.top^
 ||nustwin.com^
 ||nutmegai.live^
 ||nutra-4life.com^
@@ -53936,6 +53949,7 @@
 ||ondofi-votes.com^
 ||ondofi.icu^
 ||ondoglobalmarket.com^
+||ondoglobalmarkets.app^
 ||ondoislucky.com^
 ||ondorewards.claims^
 ||ondotokenization.com^
@@ -53967,6 +53981,7 @@
 ||onefootball.club^
 ||onefootball.fit^
 ||onefootballs.club^
+||oneforallclub.com^
 ||onegamb.at^
 ||onegetcoin.com^
 ||onegotia.com^
@@ -55874,6 +55889,7 @@
 ||persiangulfmoney.site^
 ||persiarestaurant.no^
 ||persikiposkidke.com^
+||persistence.zip^
 ||personal-business-976533.framer.app^
 ||personal-ntx360.at^
 ||personal-projects-help-tue.appwrite.network^
@@ -55891,6 +55907,7 @@
 ||pessoleldept.com^
 ||pestabetbebek.com^
 ||pestapemenangshopee.blogspot.com^
+||pestexsolutions.com.au^
 ||pesto-the-baby-king-penguin.next-cryptolist.net^
 ||petareol.top^
 ||petasusswap.com^
@@ -57680,6 +57697,7 @@
 ||ppp.com^
 ||ppp63.028426.com^
 ||ppreredirecting0-attupdate.weeblysite.com^
+||pps-lk-whatsapp.com.cn^
 ||ppumpe.com^
 ||ppwallet.vip^
 ||pqc-ledger.cc^
@@ -61622,6 +61640,7 @@
 ||roblox-esp-script-universal-pastebin.pages.dev^
 ||roblox-exec.com^
 ||roblox-exec.net^
+||roblox-execut.info^
 ||roblox-exploit-discord-server.pages.dev^
 ||roblox-free-online-log-in.pages.dev^
 ||roblox-hair-id-codes-for-boys-black.pages.dev^
@@ -62935,6 +62954,7 @@
 ||scoaladejoaca.ro^
 ||scodrextrust.online^
 ||scommesse-bitcoin-heidiconsultant-it.pages.dev^
+||scoorpioncc.store^
 ||scop-asd123.pages.dev^
 ||scopescan.pro^
 ||scopesolana.com^
@@ -62942,6 +62962,7 @@
 ||scoreinvest.fr^
 ||scorpioncasino-claim.pages.dev^
 ||scorpioncc.space^
+||scorpioncc.vc^
 ||scotiabank.co.com^
 ||scotiaonlinebank-chi.vercel.app^
 ||scotland-heritage.live^
@@ -66827,6 +66848,7 @@
 ||spongetoken-4ss.pages.dev^
 ||spongetoken-xyz.pages.dev^
 ||spontaneous-manatee-e1e35c.netlify.app^
+||spookwin.com^
 ||spooky-swap.org^
 ||spookywsap.net^
 ||spores.ngrok.app^
@@ -70734,6 +70756,8 @@
 ||teamsupport.live^
 ||teamwsp.com^
 ||teamyields.com^
+||teaprotocol-mainnet.com^
+||teaprotocol.community^
 ||tearr.xiaomeiskills.club^
 ||teaxbet.com^
 ||teazr-hardware-suport.pages.dev^
@@ -71090,6 +71114,7 @@
 ||test.handy-blitznews.professorflapjacks.com^
 ||test.hotfix-board.race-queen-fetish.com^
 ||test.jpa.professorflapjacks.com^
+||test.kiuyjnhgtet.shop^
 ||test.loginsecurecoinbaseid.com^
 ||test.lol.abqweather.com^
 ||test.notexistsadmin.abqweather.com^
@@ -75325,6 +75350,7 @@
 ||ugbna.com^
 ||ugeduecversity.iceiy.com^
 ||ughfjdu-ten.vercel.app^
+||ugonex.com^
 ||ugor.lat^
 ||ugu-iota.vercel.app^
 ||ugzxc86.pages.dev^
@@ -83524,6 +83550,7 @@
 ||xspecupdate.live^
 ||xssf.link^
 ||xssf.net^
+||xstaked.cc^
 ||xstartrade.com^
 ||xstocks-claim.biz^
 ||xstocks-defi.vip^
@@ -83728,6 +83755,7 @@
 ||yeni-2026.icu^
 ||yenimeritiking.icu^
 ||yenipadisahbet.vip^
+||yento.com^
 ||yenvastor.info^
 ||yepbit.com^
 ||yepbit2.com^
@@ -83997,6 +84025,7 @@
 ||zammfinancerewards.site^
 ||zamminilogin.webflow.io^
 ||zamwallet.io^
+||zaogax.com^
 ||zaomax.com^
 ||zaomux.com^
 ||zap-mint-starknet-id-frontend.pages.dev^
