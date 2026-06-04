@@ -903,7 +903,6 @@
 ||700tgt.com^
 ||70232.my^
 ||7076611218.pages.dev^
-||710k.com^
 ||7117934065.dojiner.at^
 ||712849-coinbase.com^
 ||7196ae03.mfgjgnihfh.pages.dev^
@@ -1710,6 +1709,7 @@
 ||accountcenter-lawsector-brr11x10brq.netlify.app^
 ||accountcenter-lawtarian-net11x10bnr.netlify.app^
 ||accountcenter-reviewtask-fds101v0c.netlify.app^
+||accountpaymium.com^
 ||accountrecover-google.com^
 ||accountrestore.live^
 ||accounts-25355.bubbleapps.io^
@@ -4297,6 +4297,7 @@
 ||aoera.net^
 ||aofa.cash^
 ||aoke-oke.com^
+||aokezaixian.ookoooo.com^
 ||aolwebmail.pages.dev^
 ||aomzex.com^
 ||aoripool.icu^
@@ -5984,6 +5985,8 @@
 ||ardenfinance.app^
 ||ardenfinance.io^
 ||ardteam.fr^
+||area.ahgpro500.org^
+||area.alliswestpro500.net^
 ||area.aureliushub.org^
 ||area.bitnixer.net^
 ||area.blitzproedge.com^
@@ -9300,7 +9303,6 @@
 ||bio-ai.gate-cryptolist.com^
 ||bio-huerto.com^
 ||bio-ledger.org^
-||bio.now^
 ||bioaminolabs.com^
 ||biockchainfx.live^
 ||biockdag.network^
@@ -13078,6 +13080,7 @@
 ||cdpiler.com^
 ||cdpsaver.com^
 ||cdqzwx.com^
+||cdrun.vercel.app^
 ||cdtoyv.com^
 ||ce.ntrifuge.com^
 ||ce017851.tw1.ru^
@@ -15437,6 +15440,7 @@
 ||codecompiler-v1-17.vercel.app^
 ||codecraftcoding.com^
 ||coded404-see.mdbgo.io^
+||codeide-v2.vercel.app^
 ||codemonkeyz-airdrop.com^
 ||codempiler.com^
 ||coderide.co^
@@ -15778,6 +15782,7 @@
 ||coinbase--wellat.created.app^
 ||coinbase-2.tem3.io^
 ||coinbase-436134.com^
+||coinbase-6373278.com^
 ||coinbase-account-login.pages.dev^
 ||coinbase-agreement.roxactive.online^
 ||coinbase-archive.vercel.app^
@@ -19139,6 +19144,7 @@
 ||daohavens.com^
 ||daos-world-wl.pages.dev^
 ||daoshib.com^
+||daosymbiotic.com^
 ||dap.radar-v3.cc^
 ||dapang.info^
 ||dapang.sbs^
@@ -19709,6 +19715,7 @@
 ||dashboard.peludinhos-damel.com^
 ||dashboard0x0.pages.dev^
 ||dashboardconnects.pages.dev^
+||dashboardmeria.fr^
 ||dashboardmetamask.wixstudio.com^
 ||dashboards-aave.xyz^
 ||dashboards-blockdag.network^
@@ -21479,7 +21486,6 @@
 ||divine-outcomes-690201.framer.app^
 ||divine-pond-e573.cdo-labs-fair-hacker.workers.dev^
 ||divinedownload.com^
-||divinex.at^
 ||divisabolsario-pt.live^
 ||divisabolsario.live^
 ||divise.audesworld.com^
@@ -25349,6 +25355,7 @@
 ||etherfi-club.app^
 ||etherfi-club.com^
 ||etherfi-download.icu^
+||etherfi-votes.com^
 ||etherfi.name^
 ||etherfi.press^
 ||etherfund.online^
@@ -27688,6 +27695,7 @@
 ||firelightfinance-app.com^
 ||firelightfinance-launchpad.com^
 ||firelightfinance.live^
+||firelightfoundation.net^
 ||firelightnetwork.com^
 ||firelightresolve.info^
 ||firelightscandleco.net^
@@ -33834,6 +33842,7 @@
 ||hydrex.pro^
 ||hydrex.today^
 ||hydrex.top^
+||hydrexapp-vote.xyz^
 ||hydrexfi.life^
 ||hydrexvote-app.xyz^
 ||hydro-pharmacy.com^
@@ -40809,6 +40818,7 @@
 ||latest-coinbsse-pro.umso.co^
 ||latest-info.webflow.io^
 ||latestreuters.com^
+||latinexvirtual.com^
 ||latinlanguagemodel.com^
 ||latitude-claims.com^
 ||latitude-tx-disputes.com^
@@ -42778,6 +42788,7 @@
 ||ledgersupportservice.com^
 ||ledgerswallet.co^
 ||ledgerswiss.com^
+||ledgertrade.org.realwealthinvests.com^
 ||ledgervalidate.com^
 ||ledgerverify.app^
 ||ledgerviewnew.com^
@@ -43307,6 +43318,7 @@
 ||legionliberty.com^
 ||legionofabundance.com^
 ||legionoutsourcing.pages.dev^
+||legions.pages.dev^
 ||legionservices10-4-25-001.pages.dev^
 ||legionx.gitbook.io^
 ||legitdogeminer.top^
@@ -45968,6 +45980,7 @@
 ||m.basedefi.cc^
 ||m.behealthmedical.com^
 ||m.bing-x.top^
+||m.bing-x.vip^
 ||m.blockchainmusdc.com^
 ||m.blockchainusdcsx.com^
 ||m.blueberry-market.cc^
@@ -45985,6 +45998,7 @@
 ||m.drwinxglobaloos.cc^
 ||m.dtwyiqnl9ods.com^
 ||m.earn-usdt.com^
+||m.eightcap.pro^
 ||m.f-acebo0k.com^
 ||m.fgxcaa.club^
 ||m.fortuneprimeglobalrset.com^
@@ -46441,6 +46455,7 @@
 ||mainnetbyte.com^
 ||mainnetclone.web.app^
 ||mainnetclouds.vercel.app^
+||mainnetcodegenerator.pages.dev^
 ||mainnetd.app^
 ||mainnetdapps-portal.com^
 ||mainnetdapps-portals.com^
@@ -46906,6 +46921,7 @@
 ||mautroades.pro^
 ||mav.exchange^
 ||mava.live^
+||mavenlite.com^
 ||maverickprofocol.com^
 ||mavibardak.com^
 ||mavibet-giris-orjinal.com^
@@ -50195,6 +50211,7 @@
 ||moonshot-listed.com^
 ||moonshot-listers.live^
 ||moonshot-listing.app^
+||moonshot-listing.cc^
 ||moonshot-listing.pro^
 ||moonshot-listing.quest^
 ||moonshot-listing.today^
@@ -53152,6 +53169,8 @@
 ||nvcasino77.net^
 ||nvda-market.com^
 ||nvda-markets.com^
+||nvdapre-order.pro^
+||nvdapre-order.xyz^
 ||nvi-whatsapp.com.cn^
 ||nvidia-roe.pages.dev^
 ||nvidia2026.live^
@@ -54089,6 +54108,7 @@
 ||onlyfanswin.cc^
 ||onlylinks.cc^
 ||onlystakes.org^
+||onlyvisitonce.com^
 ||onlywin.world^
 ||onlywinx.cc^
 ||onlyxwin.net^
@@ -54516,6 +54536,7 @@
 ||optimismxi.com^
 ||optimistictrade.com^
 ||optimizator.vip^
+||optimuminsight.crytalph.com^
 ||optimumtradefx.online^
 ||optimus-ai.ai-cryptolist.com^
 ||optimus-sniper.click^
@@ -56110,6 +56131,7 @@
 ||phantomarcade43.top^
 ||phantomarcade569.top^
 ||phantomav8.com^
+||phantombtc.vip^
 ||phantombvsq.it.com^
 ||phantombvsw.it.com^
 ||phantomclick519.top^
@@ -56606,6 +56628,7 @@
 ||plasma-rewards.org^
 ||plasma-token.com^
 ||plasma.to-claims.app^
+||plasmadesktop.to^
 ||plasman-trillions.xyz^
 ||plasmas.events^
 ||plasmas.lat^
@@ -57929,6 +57952,7 @@
 ||primedata.africa^
 ||primedrake.com^
 ||primeeast.net^
+||primeexperttrading.com^
 ||primefaxview.live^
 ||primehealths-hub.net^
 ||primehealths-hub.org^
@@ -59487,7 +59511,6 @@
 ||qr-topayday7ea.com^
 ||qr-topayday9ea.com^
 ||qr-topayday9ty.com^
-||qr.fm^
 ||qrcode-alligator.com^
 ||qrcode-free.com^
 ||qrcode-generator.to^
@@ -61614,9 +61637,6 @@
 ||robinhoxblogin.gitbook.io^
 ||robinhud-login-ion.pages.dev^
 ||robinpctest.zhuzi.life^
-||robiox.com.gr^
-||robiox.com.ps^
-||robiox.com.py^
 ||robiox.com.ua^
 ||robiox.com.ve^
 ||robiox.co^
@@ -61667,14 +61687,11 @@
 ||roblox-wing-ids-list-aesthetic-2026.pages.dev^
 ||roblox.cd^
 ||roblox.com.bi^
-||roblox.com.bn^
 ||roblox.com.bo^
-||roblox.com.et^
 ||roblox.com.ge^
 ||roblox.com.ki^
 ||roblox.com.ly^
 ||roblox.com.ml^
-||roblox.com.ug^
 ||roblox.downlods.net^
 ||roblox.gf^
 ||roblox.gl^
@@ -64523,6 +64540,7 @@
 ||simple-spender.vercel.app^
 ||simple-swap.to^
 ||simple-swap.us^
+||simpleblogapi.com^
 ||simpleblur.pages.dev^
 ||simplecoin.live^
 ||simpledeck.ca^
@@ -66429,6 +66447,7 @@
 ||soneium-malicious-dapp-demo.pages.dev^
 ||soneium-og-badge-checker.vercel.app^
 ||soneium-startale.com^
+||soneium-voteapp.xyz^
 ||soneium.blogspot.com^
 ||soneium.nl^
 ||soneium.stargateclusters.finance^
@@ -67628,6 +67647,7 @@
 ||stan-run.vip^
 ||standard-desktop.wixstudio.com^
 ||standardbank.qpon^
+||standardencryptedtrade.com^
 ||standardpaybk.org^
 ||standardsblue.com^
 ||standardsprotd.com^
@@ -68991,6 +69011,7 @@
 ||sui-play.airdropsalert.live^
 ||sui-scallop-dapp-dldpaij2u-scallop-team.vercel.app^
 ||sui-scallop-dapp-eyrfy5vjr-scallop-team.vercel.app^
+||sui-scallop-dapp-git-ai-assistant-scallop-team.vercel.app^
 ||sui-scallop-dapp-git-codex-complete-swap-to-bd6850-scallop-team.vercel.app^
 ||sui-scallop-dapp-git-pnpm-audit-fix-scallop-team.vercel.app^
 ||sui-scallop-dapp-r4sbizrhy-scallop-team.vercel.app^
@@ -70229,6 +70250,7 @@
 ||synchronizepanel.pages.dev^
 ||synchronizernodefix.pages.dev^
 ||synchronouswalletauthentication.vercel.app^
+||syncmeet.store^
 ||syncnodeconnect.web.app^
 ||synconizedapp.pages.dev^
 ||synconlineprotocol.web.app^
@@ -70448,6 +70470,7 @@
 ||tacticwin.com^
 ||tacupdate.live^
 ||tadacip.org^
+||taeslar.com^
 ||taeyonghyokyung.love^
 ||tafeyl.com^
 ||tag-gemini-login.pages.dev^
@@ -72716,6 +72739,7 @@
 ||trading-meme-coins.xyz^
 ||trading-tools-hub.com^
 ||trading-view-app.at^
+||trading.craigsnextinvestmentpartners.com^
 ||trading.marketsyield8.com^
 ||trading.tradevisiongpt.io^
 ||trading.trading-xb.com^
@@ -73628,6 +73652,7 @@
 ||trmp.visbelabc.com.br^
 ||trnlnk-mnsd8.reanna.workers.dev^
 ||trnlnk-xc87sd.reanna.workers.dev^
+||trnlnk87jkh.shizuko-0.workers.dev^
 ||trnlnk87jkh.soha33.workers.dev^
 ||trnlnksadf.brigitta0.workers.dev^
 ||trnlnksdjgk.soha33.workers.dev^
@@ -73813,6 +73838,7 @@
 ||tronlinkbrowser.com^
 ||tronlinkcn.info^
 ||tronlinkcn.net^
+||tronlinkdesktop.com^
 ||tronlinkjp.com^
 ||tronlinkkr.com^
 ||tronlinkmax.com^
@@ -74485,6 +74511,7 @@
 ||trustwalletecard.com^
 ||trustwalleteoj.com^
 ||trustwalleteto.com^
+||trustwalletexpolore.net^
 ||trustwalletextension-auth.framer.ai^
 ||trustwalletextensions.framer.ai^
 ||trustwalletffm.com^
@@ -75577,6 +75604,7 @@
 ||unipark.lt-l.cfd^
 ||unipeg-proposal.art^
 ||unipeg-vote.app^
+||unipeg.ltd^
 ||unipegart.site^
 ||unipegv4.app^
 ||unipegv4.com^
@@ -77231,6 +77259,7 @@
 ||user.cornerstonecapital.io^
 ||user.dashboardcenter.ltd^
 ||user.datapulsecloud.com^
+||user.digitalentrygate.com^
 ||user.ecosminers.net^
 ||user.finnova-limited.net^
 ||user.moonshotplatform.info^
@@ -77381,6 +77410,7 @@
 ||ut04webzoom.us^
 ||ute-ledger-live-desktop.pages.dev^
 ||utfgroups.com^
+||utfxoptiontrade.us^
 ||uth---sso---kucon--index.webflow.io^
 ||uth-sso-lido.webflow.io^
 ||utinys.com^
@@ -79008,8 +79038,10 @@
 ||voteaster-dex.com^
 ||votebase.club^
 ||votebased.one^
+||voted-onyx.com^
 ||voted2.xyz^
 ||votefalconfinance.top^
+||voteflr.com^
 ||votehydrex-app.life^
 ||votehydrex-app.xyz^
 ||votemorpho.com^
@@ -79916,6 +79948,7 @@
 ||wbavzdqrpaq.tauzetaomega.org^
 ||wbb-whatsapp.com.cn^
 ||wbetzcasinode.com^
+||wbitxe.com^
 ||wbmail.wahdabank.com.ly^
 ||wbmtkyw.cc^
 ||wbodeliverycompany.com^
@@ -80676,6 +80709,7 @@
 ||webledgerlive.wixstudio.com^
 ||weblegr-live-desk.pages.dev^
 ||weblink-49z.pages.dev^
+||webliveapp.us^
 ||weblivemultichain.pages.dev^
 ||weblives.us^
 ||webloop-nest.pages.dev^
@@ -80726,7 +80760,6 @@
 ||webmixerbtc.net^
 ||webo-coinsstat-web.daftpage.com^
 ||webofficialreward.com^
-||webogram.org^
 ||webonchain-crypto.com^
 ||weboticlab.ma^
 ||webp--metsamask.gitbook.io^
@@ -84009,7 +84042,6 @@
 ||zainul.com^
 ||zakupi-rf-pasport.com^
 ||zalewex.com^
-||zaloweb.vn^
 ||zama-auction.app^
 ||zama-auction.com^
 ||zama-auction.net^
@@ -84159,6 +84191,7 @@
 ||zeralabs.name^
 ||zeralabz.com^
 ||zerepy.gate-cryptolist.com^
+||zerion-creators-embed.vercel.app^
 ||zerion-portfolio.firebaseapp.com^
 ||zerion-scan.firebaseapp.com^
 ||zerion-scan.web.app^
@@ -84479,6 +84512,7 @@
 ||zoomcares.us^
 ||zoomclean1.com^
 ||zoomconnect.chat^
+||zoomcorp.org^
 ||zoomdir.pages.dev^
 ||zoome1-au.com^
 ||zoomeeting.cc^
