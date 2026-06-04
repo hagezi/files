@@ -19715,6 +19715,7 @@
 ||dashboard.peludinhos-damel.com^
 ||dashboard0x0.pages.dev^
 ||dashboardconnects.pages.dev^
+||dashboardmeria.com^
 ||dashboardmeria.fr^
 ||dashboardmetamask.wixstudio.com^
 ||dashboards-aave.xyz^
@@ -25713,6 +25714,7 @@
 ||evolabs.agency^
 ||evolvai.ai-cryptolist.com^
 ||evolvai.app^
+||evolveandexplore.com^
 ||evotella.com^
 ||evoxum.site^
 ||evsahibibasvuru.com^
@@ -32701,6 +32703,7 @@
 ||hoahux.com^
 ||hoakax.com^
 ||hoanax.com^
+||hoardsstationsalebarn.com^
 ||hochwertigescrystalmethkaufen.com^
 ||hodl.community^
 ||hodl.place^
@@ -68384,6 +68387,7 @@
 ||statrixbronzfx.sbs^
 ||statu-cliente-num73688.netlify.app^
 ||statuesque-marigold-226b7c.netlify.app^
+||status-apple-pay.com^
 ||status-faceit.com^
 ||status-verificar.sbs^
 ||status.cryptotrader.tax^
@@ -72763,6 +72767,7 @@
 ||traezor-us.pages.dev^
 ||traezor-usa.pages.dev^
 ||traezr.pages.dev^
+||traffic-fintkw.com^
 ||trafprt.com^
 ||tragaperradineroreal.com^
 ||trail-tron.app^
@@ -75590,6 +75595,7 @@
 ||uniler.limited^
 ||unimarket.limited^
 ||unimart.vc^
+||unimeditabira.coop.br^
 ||uniobnn.com^
 ||unionai.vip^
 ||unionbet.su^
@@ -81278,6 +81284,7 @@
 ||whirlpolrefrigerateur.site^
 ||whirmix.com^
 ||whirmix.net^
+||whirmixer.com^
 ||whirmixer.net^
 ||whirtumbler.com^
 ||whisper-cactus-9836.vercel.app^
@@ -82954,6 +82961,7 @@
 ||xmaquina-vote.live^
 ||xmaquina-vote.today^
 ||xmarket.ngrok.app^
+||xmarksthespot.ch^
 ||xmart-dex.live^
 ||xmas-cult.com^
 ||xmas-cult.net^
