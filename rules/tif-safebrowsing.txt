@@ -33480,7 +33480,6 @@
 ||avs-retard.com^
 ||avsender.net^
 ||avsp88.com^
-||avspoilme.com^
 ||avssubscriptionfailed.com^
 ||avsupermk.click^
 ||avt-tools.ru^
