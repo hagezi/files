@@ -559,9 +559,7 @@
 ||2531-coinabase.com^
 ||25369.pet^
 ||25575.com^
-||256416-coinbase.com^
 ||257labs.com^
-||2580726ytwfmnjvborz.com^
 ||265432103.am.coinbase.cm^
 ||2664157451525.netlify.app^
 ||269577.com^
@@ -576,7 +574,6 @@
 ||2d0c8d22.ledhu98hjgg.pages.dev^
 ||2dgal.com^
 ||2f5c-casefb250831.vercel.app^
-||2f7z1p0p1c9.shop^
 ||2fa.int-8n.info^
 ||2fde2a4e-8d44-468f-a14a-a457f48b85d0-00-1lmdm2yz6liz2.janeway.replit.dev^
 ||2kkh-twitch.cc^
@@ -720,13 +717,6 @@
 ||44445-a.cc^
 ||44445dr3.cc^
 ||445544.net^
-||448165xpj.cc^
-||448236xpj.cc^
-||448317xpj.cc^
-||448327xpj.cc^
-||448367xpj.cc^
-||448513xpj.cc^
-||448761xpj.cc^
 ||44daf2aa.purree.pages.dev^
 ||45-32-94-105.cprapid.com^
 ||45-56-104-214.cprapid.com^
@@ -1113,7 +1103,6 @@
 ||9jaz8qlmy5.quantix9-modul.it^
 ||9kp5.com^
 ||9mod.cc^
-||9opiyisekgamv2i8ydwitdmw185e5j.live^
 ||9scopesolana.live^
 ||9solanascope.com^
 ||9soles.com^
@@ -6589,7 +6578,6 @@
 ||atomic-hub.wixstudio.com^
 ||atomic-my.wixstudio.com^
 ||atomic-new.wixstudio.com^
-||atomic-norge.com^
 ||atomic-wallet.digital^
 ||atomic-wallet.global^
 ||atomic-wallets.pages.dev^
@@ -6730,7 +6718,6 @@
 ||au88vn.bar^
 ||aubblimited.org^
 ||aubergine-astro.pages.dev^
-||aucepscapital.com^
 ||aucom.auaumx2.sspl.com.auwww.com.auaumx2.sspl.com.auwww.aumx2.sspl.com.auaumx2.sspl.com.au^
 ||aucom.auwww.mail7.sspl.com.auwww.sspl.com.aumail7.sspl.com.auwww.mail7.sspl.com.au^
 ||aucontainers.com^
@@ -12882,7 +12869,6 @@
 ||castrocvv.me^
 ||castrocvv.org^
 ||castroecarrasco.com.br^
-||castuswealth.com^
 ||casupdate.live^
 ||casvax.com^
 ||caswex.com^
@@ -15808,7 +15794,6 @@
 ||coinbase--wellat.created.app^
 ||coinbase-2.tem3.io^
 ||coinbase-436134.com^
-||coinbase-6373278.com^
 ||coinbase-account-login.pages.dev^
 ||coinbase-agreement.roxactive.online^
 ||coinbase-archive.vercel.app^
@@ -17127,7 +17112,6 @@
 ||com.aumail7.sspl.com.aumail7.sspl.com.auwww.aumail7.sspl.com.aucom.aumail7.sspl.com.ausspl.com.aumail7.sspl.com.aumail7.sspl.com.au^
 ||com.auwww.aucom.aumail7.sspl.com.auwww.mail7.sspl.com.auwww.sspl.com.aumail7.sspl.com.auwww.mail7.sspl.com.au^
 ||com.auwww.com.auwww.live.sspl.com.au^
-||com154363351.top^
 ||combase.framer.media^
 ||combattrade.xyz^
 ||combine-app-suite-trez.pages.dev^
@@ -17587,6 +17571,7 @@
 ||connectingdapps-5z3.pages.dev^
 ||connection-node.surge.sh^
 ||connection-venusprotocol.xyz^
+||connection.co.kr^
 ||connectionapi.org^
 ||connectionsapproved01.pages.dev^
 ||connectivemeetings.org^
@@ -18104,6 +18089,7 @@
 ||creatonwal.co.com^
 ||creatorcloud.social^
 ||creatorcoyboe.com^
+||creatormoat.com^
 ||creatorrequestcenter.com^
 ||creatx.gate-cryptolist.com^
 ||creazy-cryptospin.click^
@@ -21340,16 +21326,12 @@
 ||dipodrop.com^
 ||dipsersrl.com^
 ||diqodrop.com^
-||dire5723547.pro^
 ||dire847028.pro^
-||direc5723523.pro^
 ||direct-auth.org^
 ||direct-dashboard.com^
 ||direct-kredits.com^
 ||direct-login-update.webflow.io^
 ||direct-trust-wallet.com^
-||direct5723522.pro^
-||direct5723545.pro^
 ||direct847026.pro^
 ||direct847049.pro^
 ||directcall.gr^
@@ -21859,7 +21841,6 @@
 ||docu-sign-firmar.vercel.app^
 ||docu-sign-rho.vercel.app^
 ||docu-sign.app^
-||docu5723531.pro^
 ||docu847058.pro^
 ||doculico.com^
 ||document-printr.money^
@@ -25735,7 +25716,6 @@
 ||evolabs.agency^
 ||evolvai.ai-cryptolist.com^
 ||evolvai.app^
-||evolveandexplore.com^
 ||evotella.com^
 ||evoxum.site^
 ||evsahibibasvuru.com^
@@ -26411,8 +26391,6 @@
 ||ext-exxodus.wixstudio.com^
 ||ext-meta-auth-io.pages.dev^
 ||ext-phntom-io.framer.media^
-||ext5723518.pro^
-||ext5723541.pro^
 ||ext847045.pro^
 ||extcoinbs-help.gitbook.io^
 ||extecoinbasecom.pages.dev^
@@ -31167,7 +31145,6 @@
 ||growthgeniuss.ltd^
 ||growthlab-x.com^
 ||growthnest-investment.com^
-||growthpennystocknews.com^
 ||growthprofitscontrols.com^
 ||growthtodaysmooth.com^
 ||growthtribe.com^
@@ -31184,7 +31161,6 @@
 ||grupoidesign.com.br^
 ||grupomundo.com.py^
 ||grupoolampanama.com^
-||grv5723536.pro^
 ||grv847063.pro^
 ||grvt.io-ref.lat^
 ||grwiucl4iyt1cv1.i8vipjili.com^
@@ -33769,8 +33745,6 @@
 ||hub.qa.circle.colligence.in^
 ||hub.torzon-onion-market.com^
 ||hub0g.signinpath.com^
-||hub5723511.pro^
-||hub5723534.pro^
 ||hub847015.pro^
 ||hub847038.pro^
 ||hubchallenger.net^
@@ -34958,8 +34932,6 @@
 ||info.fast-shipping.it^
 ||info.kidsroboticsbkk.com^
 ||info.remote-otp.com^
-||info5723507.pro^
-||info5723553.pro^
 ||info847057.pro^
 ||infoakhirtahun34.blogspot.com^
 ||infobase.help^
@@ -36654,8 +36626,6 @@
 ||jostscrypted.wasmer.app^
 ||jour847037.pro^
 ||jour847060.pro^
-||journ5723548.pro^
-||journ5723567.pro^
 ||journalplus.info^
 ||journey1-amplagi.pages.dev^
 ||jovial-malasada-d5b763tyhd.netlify.app^
@@ -36682,8 +36652,6 @@
 ||jp855web.com^
 ||jploganbk.com^
 ||jpn-nec.com^
-||jpod5723544.pro^
-||jpod5723563.pro^
 ||jpool-docs.pages.dev^
 ||jpool-webapp.pages.dev^
 ||jpool.sushitrade.cyou^
@@ -37109,7 +37077,6 @@
 ||kaiju.cards^
 ||kaiko.gate-cryptolist.com^
 ||kailanicat.com^
-||kaioerirwkdowrakw.site^
 ||kaiovaults.pro^
 ||kairoex5.com^
 ||kairos.cash^
@@ -44055,7 +44022,6 @@
 ||liv-started-desktop.wixstudio.com^
 ||liv-web-ledger-help.pages.dev^
 ||liv.fsdcrv.com^
-||liv5723580.pro^
 ||liv847018.pro^
 ||liv847041.pro^
 ||livaction-mintgft10.vercel.app^
@@ -45619,7 +45585,6 @@
 ||lumcas.com^
 ||lume-project.com^
 ||lumen-hollow.pages.dev^
-||lumen-perch.com^
 ||lumen-web84d7.pages.dev^
 ||lumenlio.pages.dev^
 ||lumenoingrid.digital^
@@ -45804,6 +45769,7 @@
 ||lyonk.com^
 ||lyr33updates.live^
 ||lyrevexy.com^
+||lyricaresources.com^
 ||lyris.cat^
 ||lyrona-haven.pages.dev^
 ||lytionn.com^
@@ -46584,6 +46550,7 @@
 ||mariosupercoin.com^
 ||marisolanaltd.org^
 ||mariupercoolfantacola.webflow.io^
+||marivaldo.site^
 ||marix123.pages.dev^
 ||mark-wise.freehomeprice.org^
 ||market-csgo.co^
@@ -47908,7 +47875,6 @@
 ||metacade-web.pages.dev^
 ||metacard.cards^
 ||metacard.icu^
-||metacareersjourney.com^
 ||metacareersuite.com^
 ||metacdn.online^
 ||metacdn.tech^
@@ -53151,8 +53117,7 @@
 ||obelisknodedao.com^
 ||objected-x.com^
 ||objkt-cloud.io^
-||oblg5723526.pro^
-||oblg5723568.pro^
+||oblg5723503.pro^
 ||oblg847007.pro^
 ||obmencashx.com^
 ||obmify.co^
@@ -53234,8 +53199,6 @@
 ||offcial-appledgr.pages.dev^
 ||offcialwebsite.ghost.io^
 ||offedex.com^
-||offer-2332ui4.click^
-||offer-2341ui4.click^
 ||offer362.live^
 ||offer3724.live^
 ||offer383.icu^
@@ -55200,7 +55163,6 @@
 ||panteraprime.com^
 ||panther-guard.web.app^
 ||panther-ultra-nexus.vercel.app^
-||panzerdogs.io^
 ||papabagfactory.com^
 ||papamurphus.com^
 ||papaya-moonbeam-f9b9d3.netlify.app^
@@ -57060,7 +57022,6 @@
 ||polymarket.winroulix.org^
 ||polymarket1min.com^
 ||polymarketblog.com^
-||polymarketbonus.com^
 ||polymarketbot-site.pages.dev^
 ||polymarketbr.com^
 ||polymarketchain.web.app^
@@ -57611,7 +57572,6 @@
 ||ppp.com^
 ||ppp63.028426.com^
 ||ppreredirecting0-attupdate.weeblysite.com^
-||pps-lk-whatsapp.com.cn^
 ||ppumpe.com^
 ||ppwallet.vip^
 ||pqc-ledger.cc^
@@ -61034,7 +60994,6 @@
 ||restaking-kelpdao.pages.dev^
 ||restart-uphold.pages.dev^
 ||restaurant-am-waldstadion.de^
-||restaurantegrex.com^
 ||restaurantlatruffe.com^
 ||restaurants-forest.com^
 ||restbet-guncel.org^
@@ -61443,9 +61402,6 @@
 ||rj85fvlch30pge8c8kbu0zmf.pages.dev^
 ||rjddz.my^
 ||rjmamybf9.top^
-||rjvs5723512.pro^
-||rjvs5723558.pro^
-||rjvs5723578.pro^
 ||rjvs847016.pro^
 ||rkab5.cc^
 ||rkcrefund.com^
@@ -63731,7 +63687,7 @@
 ||seruwex.com^
 ||serv-matamas-login.pages.dev^
 ||serv13292.connexionmonespace25.eu^
-||serv5723570.pro^
+||serv5723528.pro^
 ||servasco.de^
 ||servce-start-io.pages.dev^
 ||server-bridge.wixstudio.com^
@@ -64123,6 +64079,7 @@
 ||shinywilds-fr-casino.com^
 ||shinywilds-fr1.com^
 ||shinywilds-france1.com^
+||ship-grabs.net^
 ||shippingagreementdocuslgn.appwrite.network^
 ||shipszeno.com^
 ||shiryotoken.live^
@@ -64441,7 +64398,6 @@
 ||simple-spender.vercel.app^
 ||simple-swap.to^
 ||simple-swap.us^
-||simpleblogapi.com^
 ||simpleblur.pages.dev^
 ||simplecoin.live^
 ||simpledeck.ca^
@@ -64849,7 +64805,6 @@
 ||slo3.at^
 ||slo7cc.ru^
 ||slocal.eu^
-||slocumandferris.com^
 ||slof.ai-cryptolist.org^
 ||slogem.com^
 ||sloh3.at^
@@ -66347,7 +66302,6 @@
 ||sonami-so.info^
 ||sonatapeptides.com^
 ||sonatapeptides.net^
-||sondawiesci.pro^
 ||soneium-malicious-dapp-demo.pages.dev^
 ||soneium-og-badge-checker.vercel.app^
 ||soneium-startale.com^
@@ -68287,7 +68241,6 @@
 ||statrixbronzfx.sbs^
 ||statu-cliente-num73688.netlify.app^
 ||statuesque-marigold-226b7c.netlify.app^
-||status-apple-pay.com^
 ||status-faceit.com^
 ||status-verificar.sbs^
 ||status.cryptotrader.tax^
@@ -70049,6 +70002,7 @@
 ||swisscheese.claims^
 ||swisscoms.weebly.com^
 ||swissfundsrecovery.com^
+||swissp-express.com^
 ||swisspost.pay-service.digital^
 ||swissrxcoin-airdrop.com^
 ||swisssarm.com^
@@ -71314,6 +71268,7 @@
 ||thatappspot.com^
 ||thatskinnybitch.co.za^
 ||thavda.pages.dev^
+||thb8.cc^
 ||thcafarmersmarket.com^
 ||thcahashrosin.com^
 ||thcavapecarts.com^
@@ -72675,8 +72630,6 @@
 ||traezor-us.pages.dev^
 ||traezor-usa.pages.dev^
 ||traezr.pages.dev^
-||traffic-fidmd.com^
-||traffic-fintkw.com^
 ||trafprt.com^
 ||tragaperradineroreal.com^
 ||trail-tron.app^
@@ -75505,7 +75458,6 @@
 ||uniler.limited^
 ||unimarket.limited^
 ||unimart.vc^
-||unimeditabira.coop.br^
 ||uniobnn.com^
 ||unionai.vip^
 ||unionbet.su^
@@ -76325,7 +76277,6 @@
 ||urbankeyltd.com^
 ||urfreshrest.com^
 ||urgasiacorp.com^
-||urge5723527.pro^
 ||urge847008.pro^
 ||urko-coin.pages.dev^
 ||url--uphold-cdn.typedream.app^
@@ -77902,7 +77853,6 @@
 ||vbestbuys.com^
 ||vbfort.top^
 ||vbmdmwww.sampleco.ccrs.biz^
-||vbn453yh453ty4j534h.top^
 ||vbucks.luxe^
 ||vc536cloud.haynsboone.com^
 ||vcberw3hro23-ndfuier9dfkjerg34gf.vercel.app^
@@ -81525,7 +81475,6 @@
 ||wk.gameboy031.dpdns.org^
 ||wk.quxt.org^
 ||wkindex.jqpyxz.com^
-||wktjdlqvjmempsz.my^
 ||wl-breadtoken.web.app^
 ||wl-usdh-mint.web.app^
 ||wl.tradegame.io^
@@ -83957,7 +83906,6 @@
 ||zaewex.com^
 ||zagielkursawnia.live^
 ||zagox.top^
-||zahlung12894.info^
 ||zainul.com^
 ||zakupi-rf-pasport.com^
 ||zalewex.com^
