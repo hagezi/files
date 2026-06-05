@@ -1446,6 +1446,7 @@
 ||ac9055af.jascha.pages.dev^
 ||aca51e0.ewedfeewe.pages.dev^
 ||academiajoseluislopez.com^
+||academixindia.uk^
 ||academy-ledger.webflow.io^
 ||academy.darkex.com^
 ||academy.soonpayapp.io^
@@ -4454,6 +4455,7 @@
 ||apinaga7kql.sbs^
 ||apinaga7xpd.cfd^
 ||apivault.info^
+||apix-whatsapp.hl.cn^
 ||apk-amazon-clone.netlify.app^
 ||apk-minecraft-1-20.pages.dev^
 ||apkcombo-fortnite.pages.dev^
@@ -15340,6 +15342,7 @@
 ||cn-trustwallet.at^
 ||cn-trustwallet.co^
 ||cn-uphold-auth.pages.dev^
+||cn-whatsapp-webh.hl.cn^
 ||cn.135manx.com^
 ||cn.1mebetx.com^
 ||cn.ey1dwqddmu2x.com^
@@ -22939,6 +22942,7 @@
 ||e12oo-06e1-36ru-eda-4gl85.netlify.app^
 ||e15edffd8fb47a0--chimerical-dasik-e8def5.netlify.app^
 ||e20-eth.vip^
+||e2xuuwzq.cc^
 ||e40add2a.conwal.pages.dev^
 ||e41pul71wi-0880265f81.vercel.app^
 ||e555abfc.lednf-9fj3jcdb8.pages.dev^
@@ -29525,6 +29529,7 @@
 ||gesowin77.pro^
 ||gestion365plus.webcindario.com^
 ||gestiones-loginportal.com^
+||gesysjwh.bond^
 ||get--bridge-trazorr.pages.dev^
 ||get--ledgar-io-en.pages.dev^
 ||get--ledger-livelogin.pages.dev^
@@ -30706,6 +30711,7 @@
 ||gov-celularseguro.net^
 ||gov-db635f70-zlimbra-4528-48ac-6460e3.netlify.app^
 ||gov-flare.network^
+||gov-hqc.garden^
 ||govbtcclaim.org^
 ||govcn.cyou^
 ||gover-firelightfoundation.xyz^
@@ -30939,6 +30945,7 @@
 ||grid-storm-capital.pages.dev^
 ||gridium-ai.ai-cryptolist.com^
 ||gridqueue-datapoint.pages.dev^
+||gridscape.app^
 ||gridstormcapital.com^
 ||griezmannbet.com^
 ||griezmannbet.sbs^
@@ -43756,6 +43763,7 @@
 ||link.trustwalletondofinance.info^
 ||link.trustwalletondofinance.net^
 ||link010.xyz^
+||link6g.com^
 ||linkage-auth.com^
 ||linkage-pattern-2100.vercel.app^
 ||linkcash.org^
@@ -49907,6 +49915,7 @@
 ||monsterwin-win.com^
 ||monsterwin.vip^
 ||mont-investeau.com^
+||montanadebtassistance.org^
 ||montanape.spahotel.guru^
 ||montanatouchservices.com^
 ||monticello-casinos.com^
@@ -54039,6 +54048,7 @@
 ||opbnb-bridge.pages.dev^
 ||opbnb-chains.pages.dev^
 ||opbutler.xyz^
+||ope5723561.pro^
 ||ope847019.pro^
 ||ope847042.pro^
 ||open--legrlive.wixstudio.com^
@@ -54775,6 +54785,7 @@
 ||owa.sarbacame.com^
 ||owa.webshar.es^
 ||owamos.ru^
+||owepwsworiwdwoar.site^
 ||owex.com^
 ||owgir.net^
 ||owgirisleri.net^
@@ -59295,6 +59306,7 @@
 ||qfsworldvault.org^
 ||qfxbackup.com^
 ||qfxvault.com^
+||qga45bx3.top^
 ||qgvl6pt1zky3157.sbs^
 ||qh7338.com^
 ||qha.huo.mybluehost.me^
@@ -62076,6 +62088,7 @@
 ||runmarine-services.com^
 ||runoplay.com^
 ||runovex.com^
+||runsift.com^
 ||runtime-scan.com^
 ||runtime.rest^
 ||runvexplus.live^
@@ -83732,6 +83745,7 @@
 ||ymjdyp.com^
 ||yn7e-casefb922847.vercel.app^
 ||ynabioueconus-meriescs-experinces-t.vercel.app^
+||ync5qpsx.top^
 ||ynln.com^
 ||ynstbc.xyz.webplus7.a2hosted.com^
 ||yobet-gov.games^
