@@ -1554,7 +1554,6 @@
 ||735kavbet.com^
 ||736623coinbase.com^
 ||736grcsv3mx2c.cfc-execute.gz.baidubce.com^
-||738n.st0neforest.ru^
 ||73bet.app^
 ||74-242-218-249.cprapid.com^
 ||74.45.23.34.bc.googleusercontent.com^
@@ -2464,7 +2463,6 @@
 ||acapitalmarket.com^
 ||acat.com.br^
 ||acatis.tech^
-||acaviationsupplies.com^
 ||acb.im^
 ||acbdegf.pilot45.com^
 ||acc-amex.ueno-won.com^
@@ -18298,6 +18296,7 @@
 ||clawbytes.xyz^
 ||clawchemy.xyz^
 ||clawcoin.world^
+||clawd-setup.com^
 ||clawdbot-claim.live^
 ||clawdbot-live.com^
 ||clawdbot.club^
@@ -22397,7 +22396,6 @@
 ||crysaltimedubaibackup1.com^
 ||crysiox-48355.portmap.host^
 ||crystal-blockchain.com^
-||crystal.f1rebyte.ru^
 ||crystal.puffwarden.ru^
 ||crystal.travelvoucher.coupons^
 ||crystalbk.com^
@@ -24498,7 +24496,6 @@
 ||delta.rockstorm.ru^
 ||delta.skysh1ft.ru^
 ||delta.sn1rlpatch.ru^
-||delta.st0neforest.ru^
 ||deltacorealliance.com^
 ||deltainstaller.app^
 ||deltaone.ddns.net^
@@ -40371,6 +40368,7 @@
 ||hot-doge.ai-cryptolist.net^
 ||hot.mobimark.net^
 ||hotass.aqulas.me^
+||hotbet90.casino^
 ||hotcocoa.gate-cryptolist.com^
 ||hotcoinex8.com^
 ||hotdao-interface.pages.dev^
@@ -59047,7 +59045,6 @@
 ||mm-includes.gl.at.ply.gg^
 ||mm-toys.xyz^
 ||mm.com^
-||mm.f1rebyte.ru^
 ||mm.irocket.pro^
 ||mm1775.com^
 ||mmadelineandrew.pages.dev^
@@ -62705,7 +62702,6 @@
 ||night.cl0udbreeze.ru^
 ||night.darkc0de.ru^
 ||night.snowcrest.ru^
-||night.st0neforest.ru^
 ||night.windm1st.ru^
 ||nightapp-delta.vercel.app^
 ||nightcopper.info^
@@ -64729,6 +64725,7 @@
 ||open-bridge.wixstudio.com^
 ||open-c-login-io.pages.dev^
 ||open-capital-portal.info^
+||open-claw.co.com^
 ||open-ecosystem.pages.dev^
 ||open-field-data.silverfield.ru^
 ||open-homepage-ladger.wixstudio.com^
@@ -71741,7 +71738,6 @@
 ||range-gui-prod.pages.dev^
 ||range.corest0rm.ru^
 ||range.dr1ftshade.ru^
-||range.f1rebyte.ru^
 ||range.s0ckthorn.ru^
 ||range.sunsh1ne.ru^
 ||rangi.exchange^
@@ -72901,7 +72897,6 @@
 ||reqlm.org^
 ||request-for-remove-violation-strike-now.vercel.app^
 ||request-painting.gl.at.ply.gg^
-||request.affiliatesalesagent.com^
 ||requi-trezobridge.pages.dev^
 ||requieiy.cyou^
 ||required-firmware-api.one^
@@ -98096,6 +98091,7 @@
 ||wyomingllclimited.net^
 ||wyomingtrustfund.com^
 ||wyprzedaze-pl.com^
+||wyveypsx.cerocarey.com^
 ||wz38j642.network-pulse.digital^
 ||wza2i4g3.fr0stw1ng.ru^
 ||wzcoin.com^
@@ -98598,6 +98594,7 @@
 ||xconnexion.co.za^
 ||xcoob7bv.shop^
 ||xcooz.bet^
+||xcpvjq6r.cerocarey.com^
 ||xcrash.io^
 ||xcvb-ea6.pages.dev^
 ||xcvv.cc^
@@ -98626,6 +98623,7 @@
 ||xdx-rewards.info^
 ||xdxreward.live^
 ||xe-inv.com^
+||xeanui.x50wheel.bet^
 ||xeforex-online.com^
 ||xefowex.com^
 ||xegoz.com^
@@ -99821,6 +99819,7 @@
 ||yarddrq.cyou^
 ||yardvalue.cfd^
 ||yaronamotorspares.com^
+||yasbet.casino^
 ||yasha-migration.pages.dev^
 ||yashnei.cyou^
 ||yassinedfe4-39487.portmap.host^
