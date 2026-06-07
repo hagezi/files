@@ -62,17 +62,9 @@
 ! Tracking
 ||*.cdn.optimizely.com^
 
-! Amazon
-||amazon-adsystem.com^
-@@||aax-eu.amazon.de^
-
 ! JoyN
 @@||event-collector*.joyn.de^
 @@||heartbeats*.joyn.de^
-
-! Instagram
-! Comments sometimes don't load?
-@@||graph*.instagram.com^
 
 ! AdBlock-Detection
 @@||ast.bild.de^
