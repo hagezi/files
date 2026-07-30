@@ -1,11 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-comment=$1
-if [ -z "$1" ]; then
-    comment=$(date +'%Y.%m.%d-%H:%M:%S')
-fi
+comment="${1:-update}"
+branch="$(git rev-parse --abbrev-ref HEAD)"
 
-git pull
+git pull origin "$branch"
 git add .
 git commit -m "$comment"
-git push origin main
+git push origin "$branch"

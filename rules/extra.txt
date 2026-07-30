@@ -1,14 +1,24 @@
 ! META
+||star-mini-nohsts.c10r.facebook.com^
 ||star-mini.c10r.facebook.com^
 ||star-mini.fallback.c10r.facebook.com^
+||star-nohsts.c10r.facebook.com^
 ||star.c10r.facebook.com^
 ||star.fallback.c10r.facebook.com^
 ||star.fallback.c10r.instagram.com^
-||star-mini-nohsts.c10r.facebook.com^
-||star-nohsts.c10r.facebook.com^
-||graph*.instagram.com^$important
 
 ! Microsoft Xbox/Windows
+||activity.windows.com^
+||cdpcs.access.microsoft.com^
 ||client.wns.windows.com^
+||dds.microsoft.com^
 ||smartscreen.microsoft.com^
 
+! Allow
+@@||cdn.braze.eu^
+@@||deliveryengine.adswizz.com^
+@@||fscdn.eppo.cloud^
+@@||ipapi.is^
+@@||ipinfo.io^
+@@||tags-eu.tiqcdn.com^
+@@||tags.tiqcdn.com^
