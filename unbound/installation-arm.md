@@ -1,6 +1,6 @@
 # Unbound Installation (ARM64/AArch64)
 
-This README explains how to install and compile **Unbound 1.25.2** from source on an **ARM64 / AArch64** Debian- or Ubuntu-based system.
+This README explains how to install and compile **Unbound 1.26.0** from source on an **ARM64 / AArch64** Debian- or Ubuntu-based system.
 
 It also includes a post-install step, a custom configuration, and basic verification commands for DNSSEC.
 
@@ -63,14 +63,14 @@ These packages provide support for:
 Download the source archive and unpack it.
 
 ```bash
-wget https://nlnetlabs.nl/downloads/unbound/unbound-1.25.2.tar.gz
-tar -xvzf unbound-1.25.2.tar.gz
-cd unbound-1.25.2/
+wget https://nlnetlabs.nl/downloads/unbound/unbound-1.26.0.tar.gz
+tar -xvzf unbound-1.26.0.tar.gz
+cd unbound-1.26.0/
 ```
 
 ### Comment
 
-This guide is pinned to version `1.25.2`. If a newer release is preferred, replace the version number in both the URL and directory name.
+This guide is pinned to version `1.26.0`. If a newer release is preferred, replace the version number in both the URL and directory name.
 
 ### Recommended check
 
@@ -251,9 +251,9 @@ If you previously installed an older Unbound version using this guide and want t
 ```bash
 cd $HOME
 
-wget https://nlnetlabs.nl/downloads/unbound/unbound-1.25.2.tar.gz
-tar -xvzf unbound-1.25.2.tar.gz
-cd unbound-1.25.2/
+wget https://nlnetlabs.nl/downloads/unbound/unbound-1.26.0.tar.gz
+tar -xvzf unbound-1.26.0.tar.gz
+cd unbound-1.26.0/
 
 export CFLAGS="-O2"
 ./configure --build=aarch64-linux-gnu --prefix=/usr --includedir=\${prefix}/include --infodir=\${prefix}/share/info --libdir=\${prefix}/lib/aarch64-linux-gnu --mandir=\${prefix}/share/man --localstatedir=/var --runstatedir=/run --sysconfdir=/etc --with-chroot-dir= --with-dnstap-socket-path=/run/dnstap.sock --with-libevent --with-libhiredis --with-libnghttp2 --with-pidfile=/run/unbound.pid --with-pythonmodule --with-pyunbound --with-rootkey-file=/var/lib/unbound/root.key --disable-dependency-tracking --disable-flto --disable-maintainer-mode --disable-option-checking --disable-rpath --disable-silent-rules --enable-cachedb --enable-dnstap --enable-subnet --enable-systemd --enable-tfo-client --enable-tfo-server
@@ -282,9 +282,9 @@ sudo apt --purge autoremove unbound -y
 
 sudo apt install bison flex libevent-dev libexpat1-dev libhiredis-dev libnghttp2-dev libprotobuf-c-dev libssl-dev libsystemd-dev protobuf-c-compiler python3-dev swig build-essential python-is-python3 dns-root-data dnsutils wget curl -y
 
-wget https://nlnetlabs.nl/downloads/unbound/unbound-1.25.2.tar.gz
-tar -xvzf unbound-1.25.2.tar.gz
-cd unbound-1.25.2/
+wget https://nlnetlabs.nl/downloads/unbound/unbound-1.26.0.tar.gz
+tar -xvzf unbound-1.26.0.tar.gz
+cd unbound-1.26.0/
 
 export CFLAGS="-O2"
 ./configure --build=aarch64-linux-gnu --prefix=/usr --includedir=\${prefix}/include --infodir=\${prefix}/share/info --libdir=\${prefix}/lib/aarch64-linux-gnu --mandir=\${prefix}/share/man --localstatedir=/var --runstatedir=/run --sysconfdir=/etc --with-chroot-dir= --with-dnstap-socket-path=/run/dnstap.sock --with-libevent --with-libhiredis --with-libnghttp2 --with-pidfile=/run/unbound.pid --with-pythonmodule --with-pyunbound --with-rootkey-file=/var/lib/unbound/root.key --disable-dependency-tracking --disable-flto --disable-maintainer-mode --disable-option-checking --disable-rpath --disable-silent-rules --enable-cachedb --enable-dnstap --enable-subnet --enable-systemd --enable-tfo-client --enable-tfo-server
