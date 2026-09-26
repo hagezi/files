@@ -21,6 +21,10 @@
 @@||browser-intake-us3-datadoghq.com^
 @@||browser-intake-us5-datadoghq.com^
 
+! Tracking
+||delivery.consentmanager.net^
+||optimizationguide-pa.googleapis.com^
+
 ! Allow
 @@||cdn.braze.eu^
 @@||deliveryengine.adswizz.com^
