@@ -25,6 +25,10 @@
 ||delivery.consentmanager.net^
 ||optimizationguide-pa.googleapis.com^
 
+! Ads
+||54.36.96.165^
+||94.242.247.0^
+
 ! Allow
 @@||cdn.braze.eu^
 @@||deliveryengine.adswizz.com^
