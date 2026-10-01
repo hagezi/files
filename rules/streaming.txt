@@ -2,7 +2,6 @@
 @@/burning\-?series\.[a-z]{2,}$/
 @@/serienstream\.[a-z]{2,}$/
 @@/streamcloud\.[a-z]{2,}$/
-@@/xcine\.[a-z]{2,}$/
 @@||bestwish.lol^
 @@||bigwarp.io^
 @@||bigwarp.pro^
