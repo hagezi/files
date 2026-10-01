@@ -1,8 +1,11 @@
 ! Streaming
+@@/burning\-?series\.[a-z]{2,}$/
+@@/serienstream\.[a-z]{2,}$/
+@@/streamcloud\.[a-z]{2,}$/
+@@/xcine\.[a-z]{2,}$/
 @@||bestwish.lol^
 @@||bigwarp.io^
 @@||bigwarp.pro^
-@@||bs.to^
 @@||cdn-tnmr.org^
 @@||cloudatacdn.com^
 @@||d-s.io^
@@ -17,6 +20,7 @@
 @@||dsvplay.com^
 @@||einschalten.in^
 @@||filemoon.to^
+@@||filmo.to^
 @@||hexload.com^
 @@||lulu.st^
 @@||lulustream.com^
@@ -27,12 +31,8 @@
 @@||mxcontent.net^
 @@||myvidplay.com^
 @@||orbitcache.com^
-@@||s.to^
 @@||savefiles.com^
-@@||serienstream.to^
 @@||serversicuro.cc^
-@@||streamcloud.my^
-@@||streamcloud.plus^
 @@||streamhls.to^
 @@||streamruby.com^
 @@||strmup.t^
@@ -53,7 +53,3 @@
 @@||vmwesa.online^
 @@||voe-network.net^
 @@||voe.sx^
-@@||xcine.info^
-@@||xcine.io^
-@@||xcine.ru^
-
