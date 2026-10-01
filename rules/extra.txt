@@ -21,13 +21,31 @@
 @@||browser-intake-us3-datadoghq.com^
 @@||browser-intake-us5-datadoghq.com^
 
-! Tracking
-||delivery.consentmanager.net^
-||optimizationguide-pa.googleapis.com^
-
 ! Ads
 ||54.36.96.165^
 ||94.242.247.0^
+
+! Tracking
+||delivery.consentmanager.net^
+||optimizationguide-pa.googleapis.com^
+||*.cdn.optimizely.com^
+
+! Bypass
+||dns-tunnel-check.googlezip.net^$dnsrewrite=NXDOMAIN
+||use-application-dns.net^$dnsrewrite=NXDOMAIN
+||domain.name^$dnsrewrite=NXDOMAIN
+@@||adguard-dns.com^
+@@||controld.com^
+@@||dnsbunker.org^
+@@||hagezi.org^
+@@||joindns4.eu^
+@@||mullvad.net^
+@@||nextdns.io^
+@@||opendns.com^
+@@||quad9.net^
+
+! IPFS
+|*ipfs*^
 
 ! Allow
 @@||cdn.braze.eu^
