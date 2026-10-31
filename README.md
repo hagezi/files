@@ -8,7 +8,3 @@ This, that and the other - things I would like to share.
 | [`unbound/`](unbound/) | Unbound configurations (recursive and DoT forwarder) and an installation guide for ARM64 |
 
 Each folder has its own README.
-
-## Author
-
-HaGeZi

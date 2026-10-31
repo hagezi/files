@@ -125,4 +125,4 @@ sudo pihole-upstreamtime -d 7 -t 20 -m 10       # 20 slowest domains, min. 10 qu
 
 ## License
 
-GPL-3.0-or-later. Author: HaGeZi.
+GPL-3.0-or-later.

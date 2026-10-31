@@ -43,7 +43,3 @@ sudo unbound-checkconf /etc/unbound/unbound.conf && sudo systemctl restart unbou
 Check the notes at the top of the configuration file first (minimum version and further hints). Always run `unbound-checkconf` before restarting: Unbound does not start with an invalid configuration.
 
 Pi-hole upstream: `127.0.0.1#5335` · AdGuard Home upstream: `127.0.0.1:5335`
-
-## Author
-
-HaGeZi
