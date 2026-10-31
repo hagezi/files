@@ -417,7 +417,8 @@ run() { pihole-FTL sqlite3 -readonly -box "$DB" "$1"; }
 # Views
 # ---------------------------------------------------------------------------
 show_summary() {
-  local sql="WITH a AS (
+  local sql
+  sql="WITH a AS (
       SELECT $PERIOD AS period, q.status AS status,
              CASE WHEN q.status = 2 AND $ERR THEN 1 ELSE 0 END AS err,
              CASE WHEN q.reply_time IS NOT NULL AND q.reply_type NOT IN (0,12)
@@ -458,7 +459,8 @@ show_summary() {
 }
 
 show_upstreams() {
-  local sql="WITH f AS ($FWD),
+  local sql
+  sql="WITH f AS ($FWD),
     s AS (
       SELECT period, upstream, count(*) AS queries, sum(err) AS errors
       FROM f GROUP BY period, upstream
@@ -507,7 +509,8 @@ show_upstreams() {
 }
 
 show_histogram() {
-  local sql="WITH f AS ($FWD),
+  local sql
+  sql="WITH f AS ($FWD),
     h AS (
       SELECT period, upstream,
              count(*) AS n,
@@ -537,7 +540,8 @@ show_histogram() {
 }
 
 show_top() {
-  local sql="WITH f AS ($FWD),
+  local sql
+  sql="WITH f AS ($FWD),
     d AS (
       SELECT domain, count(*) AS queries,
              group_concat(DISTINCT upstream) AS upstreams

@@ -34,10 +34,12 @@ It also includes a post-install step, a custom configuration, and basic verifica
 - `sudo` access is required.
 - The configuration shown here uses **port 5335**, which is useful when another DNS service is already listening on port 53.
 - Steps 1 through 12 can be followed one at a time, in order. The [Full installation command block](#full-command-block) near the end repeats the same commands as one continuous list, for copying and pasting all at once.
-- The configuration only listens on `127.0.0.1` and only allows queries from `127.0.0.0/8`; see the `access-control` glossary entry for details.
+- The configuration only listens on `127.0.0.1`. Unbound's default access control allows only localhost (`127.0.0.0/8`) and refuses all other clients; see the `access-control` glossary entry for details.
 - The configuration keeps a local, continuously updated copy of the DNS root zone through an `auth-zone` block, which reduces the number of queries sent to the public root servers.
 - The configuration sets `num-threads: 2`; see [Optional: tune thread count](#tune-threads) for tuning it to the actual hardware.
-- The configuration sets `logfile: ""`, so Unbound logs through syslog rather than to its own file; see [Optional: logging behavior](#logging).
+- The configuration does not set `logfile`, so Unbound logs through syslog (its default) rather than to its own file; see [Optional: logging behavior](#logging).
+- The configuration is RFC compliant with four documented exceptions, marked `DEVIATION` in the file. It also contains a DNS rebinding protection with optional, commented-out exceptions; see [step 8](#step-8).
+- Unbound 1.20 is the minimum version for this configuration. The latest release is recommended, at least 1.25.2.
 
 ## 1. Update the system <a id="step-1"></a>
 
@@ -61,10 +63,10 @@ sudo apt --purge autoremove unbound -y
 
 ## 3. Install build dependencies <a id="step-3"></a>
 
-Install the toolchain, development libraries, and helper utilities required for compilation.
+Install the toolchain, development libraries, and helper utilities required for compilation. `pkg-config` is required for the systemd support (`--enable-systemd`); without it, `./configure` stops with an error.
 
 ```bash
-sudo apt install bison flex libevent-dev libexpat1-dev libhiredis-dev libnghttp2-dev libprotobuf-c-dev libssl-dev libsystemd-dev protobuf-c-compiler python3-dev swig build-essential python-is-python3 dns-root-data dnsutils wget curl -y
+sudo apt install bison flex libevent-dev libexpat1-dev libhiredis-dev libnghttp2-dev libprotobuf-c-dev libssl-dev libsystemd-dev pkg-config protobuf-c-compiler python3-dev swig build-essential python-is-python3 dns-root-data dnsutils wget curl -y
 ```
 
 ## 4. Download and extract Unbound <a id="step-4"></a>
@@ -73,13 +75,17 @@ Download the source archive and unpack it.
 
 ```bash
 wget https://nlnetlabs.nl/downloads/unbound/unbound-1.26.2.tar.gz
+wget https://nlnetlabs.nl/downloads/unbound/unbound-1.26.2.tar.gz.sha256
+[ "$(sha256sum unbound-1.26.2.tar.gz | cut -d' ' -f1)" = "$(cut -d' ' -f1 unbound-1.26.2.tar.gz.sha256)" ] && echo "Checksum OK" || echo "Checksum FAILED"
 tar -xvzf unbound-1.26.2.tar.gz
 cd unbound-1.26.2/
 ```
 
 ### Comment
 
-This guide is pinned to version `1.26.2`. If a newer release is preferred, replace the version number in both the URL and directory name.
+The checksum line must print `Checksum OK`. If it does not, the download is damaged or was tampered with: delete it and do not continue.
+
+This guide is pinned to version `1.26.2`. Unbound regularly publishes security releases, so check https://nlnetlabs.nl/projects/unbound/download/ for a newer version and use it if available: replace the version number in the URLs and the directory name.
 
 ## 5. Configure the build <a id="step-5"></a>
 
@@ -138,13 +144,15 @@ Run this command once:
 sudo -u unbound unbound-anchor -a /var/lib/unbound/root.key
 ```
 
-Then confirm the file now has content:
+`unbound-anchor` returns exit code `1` when it has created or updated the file, and `0` when no update was necessary. Neither is an error.
+
+Then confirm the file contains the root key:
 
 ```bash
-cat /var/lib/unbound/root.key
+grep "DNSKEY 257" /var/lib/unbound/root.key
 ```
 
-If this shows some text starting with `.` and a set of numbers, the file was created successfully.
+If this shows at least one line starting with `.` and containing `DNSKEY 257` (the key signing key of the root zone), the file was created successfully.
 
 ## 8. Install the configuration file <a id="step-8"></a>
 
@@ -160,12 +168,22 @@ sudo mv server.conf /etc/unbound/unbound.conf
 
 This replaces the main Unbound configuration with the downloaded file. A few parts of it are worth knowing about:
 
-- `msg-cache-size: 256m` and `rrset-cache-size: 512m` control the size of Unbound's built-in cache.
+- `msg-cache-size: 128m` and `rrset-cache-size: 256m` control the size of Unbound's built-in cache.
 - `module-config: "validator iterator"` turns on DNSSEC validation and recursive resolution.
-- Several privacy- and security-related options are already set to sensible values, reducing the information Unbound reveals to other servers and making it more resistant to common attacks.
-- `access-control: 127.0.0.0/8 allow`, together with `interface: 127.0.0.1`, means Unbound only answers queries from the local machine; see the `access-control` glossary entry for more detail.
+- Several privacy- and security-related options are already set to sensible values, reducing the information Unbound reveals to other servers and making it more resistant to common attacks. Every option is commented with the RFC it is based on; the four deliberate deviations are marked `DEVIATION`.
+- `interface: 127.0.0.1`, together with Unbound's default access control, means Unbound only answers queries from the local machine; see the `access-control` glossary entry for more detail.
+- A DNS rebinding protection (`private-address`) removes private and special-use addresses from public answers. Some services need exceptions, for example DNS blocklists for mail servers, Wi-Fi calling or Plex. They are included as commented-out `private-domain` lines: remove the leading `#` of the ones you need.
 - A `remote-control:` section allows the `unbound-control` command to manage the running service, using the files created in [step 7](#step-7).
 - An `auth-zone:` section keeps a local copy of the DNS root zone to speed up resolution.
+
+### Set the socket buffer limits
+
+The configuration uses a 4 MB socket buffer (`so-rcvbuf`, and Unbound's default send buffer). The kernel only grants this if its limits allow it, otherwise Unbound logs a warning at start and uses smaller buffers. Set the limits permanently:
+
+```bash
+printf 'net.core.rmem_max = 4194304\nnet.core.wmem_max = 4194304\n' | sudo tee /etc/sysctl.d/99-unbound.conf
+sudo sysctl --system
+```
 
 ### Recommended checks
 
@@ -189,7 +207,7 @@ Validate the syntax before starting the service:
 sudo unbound-checkconf /etc/unbound/unbound.conf
 ```
 
-No output means the configuration is valid. If there is a problem, the command prints a description of what and where.
+If the configuration is valid, the command prints `unbound-checkconf: no errors in /etc/unbound/unbound.conf`. If there is a problem, it prints a description of what and where.
 
 ## 9. Enable and start the service <a id="step-9"></a>
 
@@ -256,7 +274,7 @@ rm -rf unbound-*
 - Do not enable a separate DNSSEC validation option in AdGuard Home or Pi-hole. In AdGuard Home, the "Enable DNSSEC" option only inspects and passes through the `ad` flag that Unbound already set; it does not perform its own validation. In Pi-hole's default setup, leave DNSSEC validation off on that layer as well.
 - To confirm that DNSSEC validation is working end to end, query Unbound directly on port `5335`, as shown in [step 11](#step-11).
 - Because `remote-control` is enabled with `control-interface: 127.0.0.1`, the control channel is only reachable from the local machine. Do not change this to a non-loopback address without adding proper access restrictions, since it grants administrative control over the resolver.
-- The `auth-zone` block lists the root server addresses directly in the configuration. Since root server IP addresses can change over time, periodically compare them against the current root hints file distributed with the `dns-root-data` package.
+- The `auth-zone` block lists the addresses of the root servers that allow zone transfers (b, c, d, f, g, h, k) and of ICANN's transfer servers directly in the configuration. Since these addresses can change over time, periodically compare the root server addresses against the root hints file of the `dns-root-data` package and the whole list against the `auth-zone` example in the `example.conf` of the current Unbound release. If no listed server is reachable, `fallback-enabled: yes` keeps Unbound resolving normally.
 - If Unbound is later configured to also listen on a non-loopback interface, for example to serve other devices on a local network, add an explicit `access-control: 0.0.0.0/0 refuse` (and the IPv6 equivalent) alongside a rule allowing the intended network range.
 
 ## Optional: tune thread count <a id="tune-threads"></a>
@@ -275,7 +293,7 @@ NLnet Labs recommends setting `num-threads` equal to the number of CPU cores on 
    num-threads: 4
    ```
 
-3. When increasing `num-threads`, also increase the related `*-cache-slabs` settings (`msg-cache-slabs`, `rrset-cache-slabs`, `key-cache-slabs`, `infra-cache-slabs`). NLnet Labs' guidance is to use a power of two at or above the thread count, so for `num-threads: 4`, a value of `4` for each slab setting is a reasonable match.
+3. The related `*-cache-slabs` settings (`msg-cache-slabs`, `rrset-cache-slabs`, `key-cache-slabs`, `infra-cache-slabs`) are not set in the configuration, so Unbound sets them automatically to a power of two close to `num-threads`. Nothing else needs to be changed.
 
 4. Validate and apply the change:
 
@@ -288,7 +306,7 @@ On a system that is shared with other services, such as a Pi also running Pi-hol
 
 ## Optional: logging behavior <a id="logging"></a>
 
-With `logfile: ""`, Unbound sends its log output to syslog, which on most current Debian- or Ubuntu-based systems ends up in the systemd journal, viewable with `journalctl -u unbound`. Log rotation is handled automatically by journald.
+Without a `logfile` setting, Unbound sends its log output to syslog, which on most current Debian- or Ubuntu-based systems ends up in the systemd journal, viewable with `journalctl -u unbound`. Log rotation is handled automatically by journald.
 
 If a dedicated log file is preferred instead, `logfile` can be set to a path such as `/var/log/unbound/unbound.log`. In that case, add a `logrotate` configuration for that file, and after each rotation, trigger Unbound to release and reopen the file handle:
 
@@ -306,18 +324,13 @@ sudo unbound-control stats_noreset
 
 This prints the current counters without resetting them.
 
-By default, only aggregate counters are collected. To also break statistics down by query type, add the following to `/etc/unbound/unbound.conf` and restart the service:
-
-```
-server:
-    extended-statistics: yes
-```
+The configuration already enables `extended-statistics: yes`, so the statistics are also broken down by query type, reply code and more.
 
 For dashboards or alerting, a small daemon can poll `unbound-control stats_noreset` and expose the result in a format tools like Prometheus understand. The `unbound_exporter` project maintained by Let's Encrypt is a commonly used option for this, and works with the `remote-control` setup already in place from this guide.
 
 ## Update Unbound <a id="update"></a>
 
-Because Unbound was installed from source, it will not receive updates through `apt`. Rebuild it whenever a new upstream release or security patch becomes available.
+Because Unbound was installed from source, it will not receive updates through `apt`. Rebuild it whenever a new upstream release or security patch becomes available. Security releases are announced on https://nlnetlabs.nl/projects/unbound/security-advisories/.
 
 If you previously installed an older Unbound version using this guide and want to upgrade to a newer source release, repeat steps 4 through 6, then restart the Unbound service:
 
@@ -325,6 +338,8 @@ If you previously installed an older Unbound version using this guide and want t
 cd $HOME
 
 wget https://nlnetlabs.nl/downloads/unbound/unbound-1.26.2.tar.gz
+wget https://nlnetlabs.nl/downloads/unbound/unbound-1.26.2.tar.gz.sha256
+[ "$(sha256sum unbound-1.26.2.tar.gz | cut -d' ' -f1)" = "$(cut -d' ' -f1 unbound-1.26.2.tar.gz.sha256)" ] && echo "Checksum OK" || echo "Checksum FAILED"
 tar -xvzf unbound-1.26.2.tar.gz
 cd unbound-1.26.2/
 
@@ -333,8 +348,7 @@ export CFLAGS="-O2"
 make
 sudo make install
 
-sudo unbound-checkconf /etc/unbound/unbound.conf
-sudo systemctl restart unbound
+sudo unbound-checkconf /etc/unbound/unbound.conf && sudo systemctl restart unbound
 
 sudo systemctl status unbound
 
@@ -347,7 +361,7 @@ rm -rf unbound-*
 
 ## Full installation command block <a id="full-command-block"></a>
 
-The same commands as steps 1 through 12 above, listed together for copying and running in sequence.
+The same commands as steps 1 through 12 above, listed together for copying and running in sequence. Check the output of the checksum line: if it prints `Checksum FAILED`, stop and do not continue with the installation.
 
 ```bash
 cd $HOME
@@ -355,9 +369,11 @@ cd $HOME
 sudo apt update && sudo apt dist-upgrade -y && sudo apt autoremove -y && sudo apt autoclean -y
 sudo apt --purge autoremove unbound -y
 
-sudo apt install bison flex libevent-dev libexpat1-dev libhiredis-dev libnghttp2-dev libprotobuf-c-dev libssl-dev libsystemd-dev protobuf-c-compiler python3-dev swig build-essential python-is-python3 dns-root-data dnsutils wget curl -y
+sudo apt install bison flex libevent-dev libexpat1-dev libhiredis-dev libnghttp2-dev libprotobuf-c-dev libssl-dev libsystemd-dev pkg-config protobuf-c-compiler python3-dev swig build-essential python-is-python3 dns-root-data dnsutils wget curl -y
 
 wget https://nlnetlabs.nl/downloads/unbound/unbound-1.26.2.tar.gz
+wget https://nlnetlabs.nl/downloads/unbound/unbound-1.26.2.tar.gz.sha256
+[ "$(sha256sum unbound-1.26.2.tar.gz | cut -d' ' -f1)" = "$(cut -d' ' -f1 unbound-1.26.2.tar.gz.sha256)" ] && echo "Checksum OK" || echo "Checksum FAILED"
 tar -xvzf unbound-1.26.2.tar.gz
 cd unbound-1.26.2/
 
@@ -376,6 +392,9 @@ sudo -u unbound unbound-anchor -a /var/lib/unbound/root.key
 cd $HOME
 wget https://raw.githubusercontent.com/hagezi/files/refs/heads/main/unbound/server.conf
 sudo mv server.conf /etc/unbound/unbound.conf
+
+printf 'net.core.rmem_max = 4194304\nnet.core.wmem_max = 4194304\n' | sudo tee /etc/sysctl.d/99-unbound.conf
+sudo sysctl --system
 
 sudo unbound-checkconf /etc/unbound/unbound.conf
 sudo systemctl enable unbound
@@ -397,7 +416,7 @@ rm -rf unbound-*
 Check `sudo journalctl -u unbound -b` for the exact error. A common cause is a syntax error in `/etc/unbound/unbound.conf` that was missed during `unbound-checkconf`, or a port conflict if another resolver is already bound to the configured port.
 
 **`unbound-checkconf` reports an error**
-Re-open `/etc/unbound/unbound.conf` and check indentation, since Unbound's configuration format is sensitive to structure. Confirm that referenced paths, such as the root key file or the chroot directory, actually exist on disk.
+Open `/etc/unbound/unbound.conf` at the line named in the error message. Each option must be inside the right section (`server:`, `remote-control:` or `auth-zone:`), and an option unknown to the installed version (see the version notes at the top of the file) is reported as a syntax error. Confirm that referenced paths, such as the root key file, actually exist on disk.
 
 **Service fails with a permission error on the root key file**
 This usually means the root key file is not owned by the `unbound` user. Compare the file owner against the expected user:
@@ -425,10 +444,10 @@ sudo systemctl restart unbound
 If `dig +ad dnssec.works @127.0.0.1 -p 5335` does not return the `ad` flag, confirm that the root trust anchor file exists and is not empty, and that the system clock is correct, since DNSSEC signatures are time-sensitive. Re-running `sudo -u unbound unbound-anchor -a /var/lib/unbound/root.key` and restarting the service is a safe first step.
 
 **Queries from other devices on the network are refused**
-This is expected, since the configuration listens only on `127.0.0.1` and only allows `127.0.0.0/8`. To serve other devices, add a listening interface for the local network and a matching `access-control` rule for that network's address range.
+This is expected, since the configuration listens only on `127.0.0.1` and Unbound's default access control only allows `127.0.0.0/8`. To serve other devices, add a listening interface for the local network and a matching `access-control` rule for that network's address range.
 
 **`unbound-control stats` or an exporter shows no data, or the connection is refused**
-Confirm the `remote-control` key and certificate files exist and are valid, as described in [step 8](#step-8), and that `unbound-control status` succeeds first, as in [step 10](#step-10). If per-query-type detail is expected but missing, check that `extended-statistics: yes` has been added.
+Confirm the `remote-control` key and certificate files exist and are valid, as described in [step 8](#step-8), and that `unbound-control status` succeeds first, as in [step 10](#step-10). If per-query-type detail is missing, check that `extended-statistics: yes` is still set in the configuration.
 
 **Build fails during `./configure` or `make`**
 Re-check that all packages from step 3 are installed. A failed `./configure` step usually names the missing library directly in its output.
@@ -445,10 +464,10 @@ The 64-bit version of the ARM processor architecture, used for example in the Ra
 An extension of the DNS protocol that cryptographically signs responses. It allows a resolver to verify that a response actually originated from the authoritative server and was not tampered with.
 
 **num-threads**
-The `unbound.conf` option that sets how many worker threads Unbound uses to process queries in parallel. Related settings such as `msg-cache-slabs`, `rrset-cache-slabs`, `key-cache-slabs`, and `infra-cache-slabs` divide the corresponding caches into that many (or more) independently locked segments.
+The `unbound.conf` option that sets how many worker threads Unbound uses to process queries in parallel. Related settings such as `msg-cache-slabs`, `rrset-cache-slabs`, `key-cache-slabs`, and `infra-cache-slabs` divide the corresponding caches into independently locked segments; if they are not set, Unbound uses a power of two close to `num-threads`.
 
 **logfile**
-The `unbound.conf` option that sets where log output is written. An empty value, `logfile: ""`, sends log output to syslog instead of a dedicated file.
+The `unbound.conf` option that sets where log output is written. Without it, or with an empty value (`logfile: ""`), Unbound sends log output to syslog instead of a dedicated file.
 
 **log_reopen**
 An `unbound-control` command that tells Unbound to close and reopen its log output, mainly used after an external tool such as `logrotate` has rotated a dedicated log file.
@@ -463,7 +482,7 @@ An `unbound-control` command that prints Unbound's internal performance counters
 A third-party Prometheus metrics exporter, maintained by Let's Encrypt, that connects to Unbound's `remote-control` interface and exposes statistics for Prometheus.
 
 **systemd integration**
-Unbound's ability to hook into the Linux init and service manager systemd. During startup, systemd starts Unbound as `root`, Unbound reads privileged files and binds its listening ports, and only then drops down to the unprivileged `unbound` user.
+Unbound's support for the Linux init and service manager systemd, enabled with `--enable-systemd`. Unbound reports to systemd when it is ready to answer queries, so services ordered after `unbound.service` only start at that point. Independent of this, Unbound starts as `root`, reads privileged files and binds its listening ports, and then drops down to the unprivileged `unbound` user.
 
 **post-install.sh**
 A shell script, hosted in the `hagezi/files` repository, that creates the `unbound` system user, the `/var/lib/unbound` directory, the init script and systemd unit, and the `remote-control` key and certificate files.
@@ -478,7 +497,7 @@ The `unbound.conf` option that tells Unbound where to find and continuously upda
 The `unbound.conf` option that defines which processing modules are active, for example `"validator iterator"`, which turns on DNSSEC validation and recursive resolution.
 
 **access-control**
-The `unbound.conf` option that determines which client IP ranges may query Unbound, using actions such as `allow`, `refuse`, or `deny`.
+The `unbound.conf` option that determines which client IP ranges may query Unbound, using actions such as `allow`, `refuse`, or `deny`. Without it, Unbound allows only localhost (`127.0.0.0/8`) and refuses all other clients.
 
 **remote-control**
 A `unbound.conf` section that enables the `unbound-control` utility to manage a running Unbound instance, for example to query status or flush the cache. It requires the key and certificate files created by `post-install.sh`.
@@ -496,13 +515,13 @@ A `unbound.conf` section that keeps a local, file-based copy of a DNS zone, most
 An alternative, non-standard port for DNS queries, used here so Unbound can run alongside another DNS service on port 53.
 
 **AD flag (Authenticated Data)**
-A flag in DNS responses indicating that the resolver successfully validated the response using DNSSEC. It only appears when the query is made with the `+ad` option.
+A flag in DNS responses indicating that the resolver successfully validated the response using DNSSEC. The resolver only sets it if the query has the AD or DO bit set (RFC 6840); `dig` sets the AD bit by default, `+ad` makes this explicit.
 
 **SERVFAIL**
 A DNS response code indicating a server failure, which in the context of DNSSEC typically means signature validation failed.
 
 **unbound-checkconf**
-A command-line tool that checks the syntax of the Unbound configuration file, printing no output when the configuration is valid.
+A command-line tool that checks the syntax of the Unbound configuration file. For a valid configuration, it prints `no errors in` followed by the file name.
 
 **unbound-anchor**
 A command-line tool that sets up or updates the DNSSEC root trust anchor.
