@@ -1,6 +1,6 @@
 # Unbound Installation (ARM64/AArch64)
 
-This README explains how to install and compile **Unbound 1.26.2** from source on an **ARM64 / AArch64** Debian- or Ubuntu-based system.
+This guide explains how to install and compile **Unbound 1.26.2** from source on an **ARM64 / AArch64** Debian- or Ubuntu-based system.
 
 It also includes a post-install step, a custom configuration, and basic verification commands for DNSSEC.
 
@@ -40,6 +40,7 @@ It also includes a post-install step, a custom configuration, and basic verifica
 - The configuration does not set `logfile`, so Unbound logs through syslog (its default) rather than to its own file; see [Optional: logging behavior](#logging).
 - The configuration is RFC compliant with four documented exceptions, marked `DEVIATION` in the file. It also contains a DNS rebinding protection with optional, commented-out exceptions; see [step 8](#step-8).
 - Unbound 1.20 is the minimum version for this configuration. The latest release is recommended, at least 1.25.2.
+- Instead of `server.conf`, the optional `server-forwarder.conf` can be used: it forwards all queries encrypted (DNS over TLS) to Quad9 instead of resolving them from the root. The differences are pointed out in [step 7](#step-7), [step 8](#step-8) and [step 11](#step-11).
 
 ## 1. Update the system <a id="step-1"></a>
 
@@ -136,7 +137,7 @@ It is safe to run more than once.
 
 ### Create the DNSSEC root key
 
-Unbound needs one more file before it can start: the DNSSEC root trust anchor, at `/var/lib/unbound/root.key`.
+With `server.conf`, Unbound needs one more file before it can start: the DNSSEC root trust anchor, at `/var/lib/unbound/root.key`. With `server-forwarder.conf`, this file is not used and this part can be skipped.
 
 Run this command once:
 
@@ -166,7 +167,15 @@ sudo mv server.conf /etc/unbound/unbound.conf
 
 ### Comment
 
-This replaces the main Unbound configuration with the downloaded file. A few parts of it are worth knowing about:
+To use the forwarder instead, download `server-forwarder.conf` and move it to the same place:
+
+```bash
+cd $HOME
+wget https://raw.githubusercontent.com/hagezi/files/refs/heads/main/unbound/server-forwarder.conf
+sudo mv server-forwarder.conf /etc/unbound/unbound.conf
+```
+
+This replaces the main Unbound configuration with the downloaded file. A few parts of `server.conf` are worth knowing about:
 
 - `msg-cache-size: 128m` and `rrset-cache-size: 256m` control the size of Unbound's built-in cache.
 - `module-config: "validator iterator"` turns on DNSSEC validation and recursive resolution.
@@ -178,7 +187,7 @@ This replaces the main Unbound configuration with the downloaded file. A few par
 
 ### Set the socket buffer limits
 
-The configuration uses a 4 MB socket buffer (`so-rcvbuf`, and Unbound's default send buffer). The kernel only grants this if its limits allow it, otherwise Unbound logs a warning at start and uses smaller buffers. Set the limits permanently:
+`server.conf` uses a 4 MB receive buffer (`so-rcvbuf`), and Unbound uses a 4 MB send buffer by default. Started as root by systemd, Unbound sets these buffers itself. If it starts without root privileges (e.g. in a container), the kernel limits apply, and Unbound logs a warning and uses smaller buffers. Setting the limits permanently avoids this and does no harm otherwise:
 
 ```bash
 printf 'net.core.rmem_max = 4194304\nnet.core.wmem_max = 4194304\n' | sudo tee /etc/sysctl.d/99-unbound.conf
@@ -258,6 +267,8 @@ dig +ad dnssec.works @127.0.0.1 -p 5335
 
 If both results match, the installation is complete and working.
 
+With `server-forwarder.conf`, DNSSEC is validated by Quad9: `fail01.dnssec.works` still returns `SERVFAIL`, but `dnssec.works` returns no `ad` flag, because this Unbound does not validate itself. A `NOERROR` answer with an IP address means the installation is working.
+
 ## 12. Clean up <a id="step-12"></a>
 
 Remove the downloaded source and extracted directories when the installation is complete.
@@ -274,7 +285,7 @@ rm -rf unbound-*
 - Do not enable a separate DNSSEC validation option in AdGuard Home or Pi-hole. In AdGuard Home, the "Enable DNSSEC" option only inspects and passes through the `ad` flag that Unbound already set; it does not perform its own validation. In Pi-hole's default setup, leave DNSSEC validation off on that layer as well.
 - To confirm that DNSSEC validation is working end to end, query Unbound directly on port `5335`, as shown in [step 11](#step-11).
 - Because `remote-control` is enabled with `control-interface: 127.0.0.1`, the control channel is only reachable from the local machine. Do not change this to a non-loopback address without adding proper access restrictions, since it grants administrative control over the resolver.
-- The `auth-zone` block lists the addresses of the root servers that allow zone transfers (b, c, d, f, g, h, k) and of ICANN's transfer servers directly in the configuration. Since these addresses can change over time, periodically compare the root server addresses against the root hints file of the `dns-root-data` package and the whole list against the `auth-zone` example in the `example.conf` of the current Unbound release. If no listed server is reachable, `fallback-enabled: yes` keeps Unbound resolving normally.
+- The `auth-zone` block of `server.conf` lists the addresses of the root servers that allow zone transfers (b, c, d, f, g, h, k) and of ICANN's transfer servers directly in the configuration. Since these addresses can change over time, periodically compare the root server addresses against the root hints file of the `dns-root-data` package and the whole list against the `auth-zone` example in the `example.conf` of the current Unbound release. If no listed server is reachable, `fallback-enabled: yes` keeps Unbound resolving normally.
 - If Unbound is later configured to also listen on a non-loopback interface, for example to serve other devices on a local network, add an explicit `access-control: 0.0.0.0/0 refuse` (and the IPv6 equivalent) alongside a rule allowing the intended network range.
 
 ## Optional: tune thread count <a id="tune-threads"></a>
@@ -293,7 +304,9 @@ NLnet Labs recommends setting `num-threads` equal to the number of CPU cores on 
    num-threads: 4
    ```
 
-3. The related `*-cache-slabs` settings (`msg-cache-slabs`, `rrset-cache-slabs`, `key-cache-slabs`, `infra-cache-slabs`) are not set in the configuration, so Unbound sets them automatically to a power of two close to `num-threads`. Nothing else needs to be changed.
+3. The related `*-cache-slabs` settings (`msg-cache-slabs`, `rrset-cache-slabs`, `key-cache-slabs`, `infra-cache-slabs`) are not set in the configuration, so Unbound sets them automatically to a power of two of at least 4 that matches `num-threads` (4 for up to 5 threads, 8 for 6 to 10 threads). Nothing else needs to be changed.
+
+   `server-forwarder.conf` is the exception: it uses one thread on purpose (fewer TLS connections, more reuse) and sets `msg-cache-slabs`, `rrset-cache-slabs` and `infra-cache-slabs` to `1`. When raising `num-threads` there, remove these three lines.
 
 4. Validate and apply the change:
 
@@ -416,7 +429,7 @@ rm -rf unbound-*
 Check `sudo journalctl -u unbound -b` for the exact error. A common cause is a syntax error in `/etc/unbound/unbound.conf` that was missed during `unbound-checkconf`, or a port conflict if another resolver is already bound to the configured port.
 
 **`unbound-checkconf` reports an error**
-Open `/etc/unbound/unbound.conf` at the line named in the error message. Each option must be inside the right section (`server:`, `remote-control:` or `auth-zone:`), and an option unknown to the installed version (see the version notes at the top of the file) is reported as a syntax error. Confirm that referenced paths, such as the root key file, actually exist on disk.
+Open `/etc/unbound/unbound.conf` at the line named in the error message. Each option must be inside the right section (`server:`, `remote-control:`, `auth-zone:` or, in `server-forwarder.conf`, `forward-zone:`), and an option unknown to the installed version (see the version notes at the top of the file) is reported as a syntax error. Confirm that referenced paths, such as the root key file, actually exist on disk.
 
 **Service fails with a permission error on the root key file**
 This usually means the root key file is not owned by the `unbound` user. Compare the file owner against the expected user:
@@ -441,7 +454,7 @@ sudo systemctl restart unbound
 ```
 
 **DNSSEC test does not return the expected result**
-If `dig +ad dnssec.works @127.0.0.1 -p 5335` does not return the `ad` flag, confirm that the root trust anchor file exists and is not empty, and that the system clock is correct, since DNSSEC signatures are time-sensitive. Re-running `sudo -u unbound unbound-anchor -a /var/lib/unbound/root.key` and restarting the service is a safe first step.
+With `server.conf`: if `dig +ad dnssec.works @127.0.0.1 -p 5335` does not return the `ad` flag, confirm that the root trust anchor file exists and is not empty, and that the system clock is correct, since DNSSEC signatures are time-sensitive. Re-running `sudo -u unbound unbound-anchor -a /var/lib/unbound/root.key` and restarting the service is a safe first step. With `server-forwarder.conf`, a missing `ad` flag is expected (see [step 11](#step-11)).
 
 **Queries from other devices on the network are refused**
 This is expected, since the configuration listens only on `127.0.0.1` and Unbound's default access control only allows `127.0.0.0/8`. To serve other devices, add a listening interface for the local network and a matching `access-control` rule for that network's address range.
@@ -464,7 +477,7 @@ The 64-bit version of the ARM processor architecture, used for example in the Ra
 An extension of the DNS protocol that cryptographically signs responses. It allows a resolver to verify that a response actually originated from the authoritative server and was not tampered with.
 
 **num-threads**
-The `unbound.conf` option that sets how many worker threads Unbound uses to process queries in parallel. Related settings such as `msg-cache-slabs`, `rrset-cache-slabs`, `key-cache-slabs`, and `infra-cache-slabs` divide the corresponding caches into independently locked segments; if they are not set, Unbound uses a power of two close to `num-threads`.
+The `unbound.conf` option that sets how many worker threads Unbound uses to process queries in parallel. Related settings such as `msg-cache-slabs`, `rrset-cache-slabs`, `key-cache-slabs`, and `infra-cache-slabs` divide the corresponding caches into independently locked segments; if they are not set, Unbound uses a power of two of at least 4 that matches `num-threads`.
 
 **logfile**
 The `unbound.conf` option that sets where log output is written. Without it, or with an empty value (`logfile: ""`), Unbound sends log output to syslog instead of a dedicated file.
