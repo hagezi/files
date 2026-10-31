@@ -1,6 +1,4 @@
-# files
-
-This, that and the other - things I would like to share.
+# This, that and the other - things I would like to share.
 
 | Folder | Content |
 |---|---|
