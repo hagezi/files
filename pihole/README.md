@@ -8,7 +8,7 @@ The database is always opened **read-only**, so they are safe to run on a live s
 | `pihole-replycheck.sh` | Find failed replies: SERVFAIL, real "no reply" failures, REFUSED, NXDOMAIN, ... |
 | `pihole-blockrate.sh` | Block rate per client, with a total over all clients |
 | `pihole-domainexport.sh` | Export blocked and/or passed domains to text files |
-| `pihole-upstreamtime.sh` | Reply times per upstream DNS server (avg, median, P95, max) |
+| `pihole-upstreamtime.sh` | DNS performance: cache hit rate, errors, client latency, reply times per upstream |
 
 ## Requirements
 
@@ -93,13 +93,22 @@ Hourly cron job, one hour of overlap so a failed run loses nothing:
 
 ## pihole-upstreamtime
 
-Reply time in ms per upstream server, measured by Pi-hole for forwarded queries
-(cache answers are not counted). Error replies are excluded unless `-e` is given.
+DNS performance indicators, for the whole time range or per day or hour:
+
+- **Overview:** cache hit rate, stale answers, retries, error rate and the
+  latency the clients actually experience (incl. cache and blocked queries)
+- **Upstreams:** share, reply time in ms (avg, median, P95, max) and error rate
+- **Histogram** (`-b`): reply times in ranges from < 10 ms to >= 500 ms
+- **Slowest domains** (`-t N`): top N by median reply time
+
+Unanswered queries that dnsmasq merged into another answered query are not
+counted as errors.
 
 ```bash
-sudo pihole-upstreamtime                        # today, one row per upstream
+sudo pihole-upstreamtime                        # today: overview + upstreams
 sudo pihole-upstreamtime -d 7 -g day            # last 7 days, per day
-sudo pihole-upstreamtime -H 24 -g hour          # last 24 full hours, per hour
+sudo pihole-upstreamtime -H 24 -g hour -b       # last 24 full hours, with histogram
+sudo pihole-upstreamtime -d 7 -t 20 -m 10       # 20 slowest domains, min. 10 queries
 ```
 
 ## Common options

@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 #
-# pihole-upstreamtime - reply times per upstream DNS server from the Pi-hole FTL database
+# pihole-upstreamtime - DNS performance indicators from the Pi-hole FTL database
 #
-# Shows for every upstream server the number of forwarded queries and the
-# reply time in milliseconds (average, median, 95th percentile, maximum),
-# optionally per day or per hour, plus a total over all upstreams.
-# The database is opened read-only, so the script is safe to run on a live system.
+# Shows an overview (cache hit rate, stale answers, retries, errors, latency
+# seen by the clients), the reply times per upstream DNS server (average,
+# median, 95th percentile, maximum, error rate) and optionally a reply time
+# histogram and the slowest domains, for the whole time range or per day or
+# hour. The database is opened read-only, so the script is safe to run on a
+# live system.
 #
 # Author:       HaGeZi
 # License:      GNU General Public License v3.0 or later (GPL-3.0-or-later)
@@ -31,7 +33,7 @@
 # Usage:
 #   sudo pihole-upstreamtime [options]      (run with -h for all options and examples)
 
-VERSION="1.0.0"
+VERSION="1.1.0"
 
 # ---------------------------------------------------------------------------
 # Defaults
@@ -43,6 +45,12 @@ FROM=""
 TO=""
 GROUP="none"
 SORT="avg"
+WINDOW=10
+TOPN=0
+MINQ=5
+HIST=0
+NOSUMMARY=0
+NOUPSTREAMS=0
 NOTOTAL=0
 WITHERR=0
 QTYPES=()
@@ -54,13 +62,12 @@ usage() {
   local me
   me=$(basename "$0")
   cat <<EOF
-$me $VERSION - reply times per upstream from the FTL database
+$me $VERSION - DNS performance indicators from the FTL database
 
 Usage: $me [options]
 
-Without options: today, all query types, one row per upstream, sorted by
-average reply time. Only forwarded queries are counted, answers from the
-Pi-hole cache are not. The database is opened read-only.
+Without options: today, all query types, the overview and one row per
+upstream, sorted by average reply time. The database is opened read-only.
 
 Time range (use only one of -d, -H, --from):
   -d, --days N            Number of days, counted from today 00:00
@@ -75,63 +82,103 @@ Time range (use only one of -d, -H, --from):
 
 Filters:
   -u, --upstream SERVER   Only this upstream, e.g. 127.0.0.1#5335. Repeatable.
+                          Applies to all views except the overview.
   -q, --qtype TYPE        Query type to include, e.g. A, AAAA, HTTPS.
                           Repeatable. Default: all query types
   -c, --client CLIENT     Only queries from this client, given as IP address or
                           client name (case-insensitive). Repeatable.
   -x, --exclude DOMAIN    Ignore queries for a domain incl. all its subdomains.
                           Repeatable. A leading dot is ignored.
-  -e, --errors            Also count replies with errors (SERVFAIL, REFUSED,
-                          NOTIMP). Default: only answers without error and
-                          NXDOMAIN, so timeouts do not distort the times.
+  -e, --errors            Include replies with errors (SERVFAIL, REFUSED,
+                          NOTIMP) in the reply times. Default: times only of
+                          answers without error and NXDOMAIN, so timeouts do
+                          not distort them. Error rates are always shown.
+
+Views:
+  -b, --histogram         Also show the distribution of the reply times per
+                          upstream: < 10, 10-50, 50-100, 100-500, >= 500 ms
+  -t, --top N             Also show the N slowest domains by median reply time
+  -m, --min-queries N     With -t: only domains with at least N forwarded
+                          queries. Default: $MINQ
+      --no-summary        Do not show the overview
+      --no-upstreams      Do not show the reply times per upstream
+      --no-total          Do not show the total row below the upstreams
 
 Output:
-  -g, --group PERIOD      none, day or hour: one row per upstream and period,
-                          e.g. to compare times before and after a change.
+  -g, --group PERIOD      none, day or hour: one row per period (and upstream),
+                          e.g. to compare before and after a change.
                           Default: $GROUP
-  -s, --sort COLUMN       Sort by upstream, queries, avg, median, p95 or max.
-                          Upstream sorts ascending, the others descending,
-                          except avg (fastest first). Default: $SORT
-      --no-total          Do not show the total over all upstreams
+  -s, --sort COLUMN       Sort the upstreams by upstream, queries, share, avg,
+                          median, p95, max or errors. upstream sorts ascending,
+                          avg fastest first, the others largest first.
+                          Default: $SORT
 
 Other:
+  -w, --window SEC        Duplicate window for unanswered queries in seconds,
+                          see "Errors" below. Default: $WINDOW
   -f, --db FILE           Path to the FTL database.
                           Default: $DB
   -h, --help              Show this help and exit
   -V, --version           Show the version and exit
 
-Output columns:
-  Period (with -g), Upstream, Queries, Avg, Median, P95, Max (all in ms)
-  P95: 95 % of the queries were answered at least this fast.
+Overview (all queries, incl. cache and blocked):
+  Queries      All queries in the time range
+  Blocked %    Blocked queries of all queries
+  Cache %      Answered from the Pi-hole cache, incl. stale (of not blocked)
+  Stale %      Answered with an expired cache entry (of not blocked). Rising
+               values mean the upstream does not keep up with refreshing.
+  Fwd %        Forwarded to an upstream (of not blocked)
+  Retries %    Retried or already forwarded queries (of not blocked). Rising
+               values mean clients repeat queries, an early sign of a slow
+               upstream.
+  Errors %     Error replies of the forwarded queries, see "Errors" below
+  Client avg / Client median
+               Reply time in ms seen by the clients, over all answered
+               queries incl. cache and blocked: the latency users experience
+
+Upstreams (forwarded queries):
+  Queries      Forwarded queries, incl. errors
+  Share %      Share of all forwarded queries
+  Avg, Median, P95, Max
+               Reply time in ms. P95: 95 % were answered at least this fast.
+  Errors %     Error replies of the forwarded queries
+
+Errors:
+  SERVFAIL, REFUSED, NOTIMP and queries without any reply. A query without
+  reply is not counted if dnsmasq merged it into another in-flight query
+  for the same domain and type that was answered within the duplicate window
+  (these are shown as "No reply received" in the Pi-hole query log).
 
 Query types:
   A AAAA ANY SRV SOA PTR TXT NAPTR MX DS RRSIG DNSKEY NS OTHER SVCB HTTPS
 
 Examples:
-  # Today, one row per upstream
+  # Today: overview and upstreams
   $me
-  # Last 7 days, one row per upstream and day
+  # Last 7 days per day, e.g. to see trends
   $me -d 7 -g day
-  # Last 24 full hours per hour, only one upstream
-  $me -H 24 -g hour -u 127.0.0.1#5335
+  # Last 24 full hours per hour, with histogram
+  $me -H 24 -g hour -b
+  # The 20 slowest domains of the last 7 days (at least 10 queries)
+  $me -d 7 -t 20 -m 10 --no-summary --no-upstreams
   # Compare two time windows, e.g. before and after a change
   $me --from "yesterday 18:00" --to "yesterday 22:00"
   $me --from "today 18:00" --to "today 22:00"
-  # Only A and AAAA queries of one client
-  $me -q A -q AAAA -c laptop
+  # Only A and AAAA queries of one client, one upstream
+  $me -q A -q AAAA -c laptop -u 127.0.0.1#5335
   # Use a copy of the database
   sudo cp $DB /tmp/ftl-copy.db
   $me -f /tmp/ftl-copy.db -d 30
 
 Notes:
   - Needs read access to the database, so usually run with sudo.
-  - The times are measured by Pi-hole: from forwarding a query to the
-    upstream until its reply. If the upstream is a local resolver (e.g.
-    Unbound), its own cache hits pull the average down; the median and P95
-    are then more meaningful. Times of the servers behind a local resolver
-    are only known to that resolver (Unbound: unbound-control dump_infra).
+  - Reply times are measured by Pi-hole: from forwarding a query until its
+    reply. If the upstream is a local resolver (e.g. Unbound), its own cache
+    hits pull the average down; the median and P95 are more meaningful then.
+    Times of the servers behind a local resolver are only known to that
+    resolver (Unbound: unbound-control dump_infra).
   - FTL writes to the database once per minute, the last minute may be
-    missing.
+    missing. Long time ranges can take a while on a Raspberry Pi.
 
 Exit status:
   0  success (also if there are no results)
@@ -149,40 +196,49 @@ die() { echo "$(basename "$0"): $*" >&2; exit 1; }
 DAYS_SET=0
 while [ $# -gt 0 ]; do
   case "$1" in
-    -d|--days)     DAYS="${2:?Number of days missing}"; DAYS_SET=1; shift 2 ;;
-    -H|--hours)    HOURS="${2:?Number of hours missing}"; shift 2 ;;
-    --from)        FROM="${2:?Start time missing}"; shift 2 ;;
-    --to)          TO="${2:?End time missing}"; shift 2 ;;
-    -u|--upstream) UPSTREAMS+=("${2:?Upstream missing}"); shift 2 ;;
-    -q|--qtype)    QTYPES+=("${2:?Query type missing}"); shift 2 ;;
-    -c|--client)   CLIENTS+=("${2:?Client missing}"); shift 2 ;;
-    -x|--exclude)  EXCLUDES+=("${2:?Domain missing}"); shift 2 ;;
-    -e|--errors)   WITHERR=1; shift ;;
-    -g|--group)    GROUP="${2:?Period missing}"; shift 2 ;;
-    -s|--sort)     SORT="${2:?Column missing}"; shift 2 ;;
-    --no-total)    NOTOTAL=1; shift ;;
-    -f|--db)       DB="${2:?Database path missing}"; shift 2 ;;
-    -h|--help)     usage; exit 0 ;;
-    -V|--version)  echo "$(basename "$0") $VERSION"
-                   echo "Copyright (C) HaGeZi. License GPLv3+: GNU GPL version 3 or later"
-                   echo "<https://www.gnu.org/licenses/gpl-3.0.html>"
-                   exit 0 ;;
-    *)             die "unknown option: $1 (help: -h)" ;;
+    -d|--days)        DAYS="${2:?Number of days missing}"; DAYS_SET=1; shift 2 ;;
+    -H|--hours)       HOURS="${2:?Number of hours missing}"; shift 2 ;;
+    --from)           FROM="${2:?Start time missing}"; shift 2 ;;
+    --to)             TO="${2:?End time missing}"; shift 2 ;;
+    -u|--upstream)    UPSTREAMS+=("${2:?Upstream missing}"); shift 2 ;;
+    -q|--qtype)       QTYPES+=("${2:?Query type missing}"); shift 2 ;;
+    -c|--client)      CLIENTS+=("${2:?Client missing}"); shift 2 ;;
+    -x|--exclude)     EXCLUDES+=("${2:?Domain missing}"); shift 2 ;;
+    -e|--errors)      WITHERR=1; shift ;;
+    -b|--histogram)   HIST=1; shift ;;
+    -t|--top)         TOPN="${2:?Number of domains missing}"; shift 2 ;;
+    -m|--min-queries) MINQ="${2:?Number of queries missing}"; shift 2 ;;
+    --no-summary)     NOSUMMARY=1; shift ;;
+    --no-upstreams)   NOUPSTREAMS=1; shift ;;
+    --no-total)       NOTOTAL=1; shift ;;
+    -g|--group)       GROUP="${2:?Period missing}"; shift 2 ;;
+    -s|--sort)        SORT="${2:?Column missing}"; shift 2 ;;
+    -w|--window)      WINDOW="${2:?Seconds missing}"; shift 2 ;;
+    -f|--db)          DB="${2:?Database path missing}"; shift 2 ;;
+    -h|--help)        usage; exit 0 ;;
+    -V|--version)     echo "$(basename "$0") $VERSION"
+                      echo "Copyright (C) HaGeZi. License GPLv3+: GNU GPL version 3 or later"
+                      echo "<https://www.gnu.org/licenses/gpl-3.0.html>"
+                      exit 0 ;;
+    *)                die "unknown option: $1 (help: -h)" ;;
   esac
 done
 
 # ---------------------------------------------------------------------------
 # Validate input and environment
 # ---------------------------------------------------------------------------
-[[ "$DAYS" =~ ^[1-9][0-9]*$ ]]   || die "invalid number of days: $DAYS"
-[[ "$HOURS" =~ ^[0-9]+$ ]]       || die "invalid number of hours: $HOURS"
+[[ "$DAYS" =~ ^[1-9][0-9]*$ ]] || die "invalid number of days: $DAYS"
+[[ "$HOURS" =~ ^[0-9]+$ ]]     || die "invalid number of hours: $HOURS"
+[[ "$TOPN" =~ ^[0-9]+$ ]]      || die "invalid number of domains: $TOPN"
+[[ "$MINQ" =~ ^[0-9]+$ ]]      || die "invalid minimum number of queries: $MINQ"
+[[ "$WINDOW" =~ ^[0-9]+$ ]]    || die "invalid window: $WINDOW"
 n=0
 [ "$DAYS_SET" -eq 1 ] && n=$((n + 1))
 [ "$HOURS" -gt 0 ] && n=$((n + 1))
 [ -n "$FROM" ] && n=$((n + 1))
 [ "$n" -le 1 ] || die "use only one of -d, -H and --from"
-command -v pihole-FTL >/dev/null  || die "pihole-FTL not found (Pi-hole v6 required)"
-[ -r "$DB" ]                     || die "database not readable: $DB (try sudo)"
+command -v pihole-FTL >/dev/null || die "pihole-FTL not found (Pi-hole v6 required)"
+[ -r "$DB" ]                    || die "database not readable: $DB (try sudo)"
 
 case "${GROUP,,}" in
   none) PERIOD="''" ;;
@@ -194,15 +250,16 @@ GROUP="${GROUP,,}"
 
 # Sort: upstream ascending, avg ascending (fastest first), others descending
 case "${SORT,,}" in
-  upstream) SORTKEY="upstream ASC" ;;
-  queries)  SORTKEY="queries DESC" ;;
-  avg)      SORTKEY="avg_ms ASC" ;;
-  median)   SORTKEY="median_ms DESC" ;;
-  p95)      SORTKEY="p95_ms DESC" ;;
-  max)      SORTKEY="max_ms DESC" ;;
-  *)        die "invalid sort column: $SORT (upstream, queries, avg, median, p95, max)" ;;
+  upstream) SORTKEY="s.upstream ASC" ;;
+  queries)  SORTKEY="s.queries DESC" ;;
+  share)    SORTKEY="s.queries DESC" ;;
+  avg)      SORTKEY="t.avg_ms ASC" ;;
+  median)   SORTKEY="t.median_ms DESC" ;;
+  p95)      SORTKEY="t.p95_ms DESC" ;;
+  max)      SORTKEY="t.max_ms DESC" ;;
+  errors)   SORTKEY="1.0 * s.errors / s.queries DESC" ;;
+  *)        die "invalid sort column: $SORT (upstream, queries, share, avg, median, p95, max, errors)" ;;
 esac
-ORDER="period ASC, $SORTKEY, upstream ASC"
 
 # Query types as stored by FTL v6 in queries.type
 declare -A QTYPE_ID=(
@@ -230,6 +287,12 @@ like_quote() {
   sql_quote "$s"
 }
 
+# SQL: percentage of $1 in $2, formatted, "-" if $2 is 0
+pct() { echo "CASE WHEN ($2) > 0 THEN printf('%6.2f', 100.0 * ($1) / ($2)) ELSE '     -' END"; }
+
+# SQL: milliseconds, formatted
+fmt_ms() { echo "printf('%8.1f', $1)"; }
+
 # ---------------------------------------------------------------------------
 # Time range
 # ---------------------------------------------------------------------------
@@ -252,12 +315,34 @@ else
   FROM_TS=$(date -d "$(date +%F) $((DAYS - 1)) days ago" +%s)
   TO_TS=$(date +%s)
 fi
-TIME_FILTER="AND q.timestamp >= $FROM_TS AND q.timestamp < $TO_TS"
 RANGE="$(date -d "@$FROM_TS" '+%Y-%m-%d %H:%M') to $(date -d "@$TO_TS" '+%Y-%m-%d %H:%M')"
 
 # ---------------------------------------------------------------------------
 # Filters
 # ---------------------------------------------------------------------------
+# Common filters for all views
+COMMON="AND q.timestamp >= $FROM_TS AND q.timestamp < $TO_TS $QTYPE_FILTER"
+
+if [ ${#CLIENTS[@]} -gt 0 ]; then
+  ips=""; names=""
+  for c in "${CLIENTS[@]}"; do
+    ips+="${ips:+,}'$(sql_quote "$c")'"
+    names+="${names:+,}lower('$(sql_quote "$c")')"
+  done
+  COMMON+=" AND (q.client IN ($ips)
+                OR q.client IN (SELECT na.ip FROM network_addresses na
+                                WHERE lower(na.name) IN ($names))
+                OR q.client IN (SELECT cb.ip FROM client_by_id cb
+                                WHERE lower(cb.name) IN ($names)))"
+fi
+
+for x in "${EXCLUDES[@]}"; do
+  x="${x#.}"
+  COMMON+=" AND NOT (q.domain = '$(sql_quote "$x")'
+                     OR q.domain LIKE '%.$(like_quote "$x")' ESCAPE '\\')"
+done
+
+# Upstream filter (all views except the overview)
 UPSTREAM_FILTER=""
 if [ ${#UPSTREAMS[@]} -gt 0 ]; then
   list=""
@@ -265,119 +350,231 @@ if [ ${#UPSTREAMS[@]} -gt 0 ]; then
   UPSTREAM_FILTER="AND q.forward IN ($list)"
 fi
 
-CLIENT_FILTER=""
-if [ ${#CLIENTS[@]} -gt 0 ]; then
-  ips=""; names=""
-  for c in "${CLIENTS[@]}"; do
-    ips+="${ips:+,}'$(sql_quote "$c")'"
-    names+="${names:+,}lower('$(sql_quote "$c")')"
-  done
-  CLIENT_FILTER="AND (q.client IN ($ips)
-                      OR q.client IN (SELECT na.ip FROM network_addresses na
-                                      WHERE lower(na.name) IN ($names))
-                      OR q.client IN (SELECT cb.ip FROM client_by_id cb
-                                      WHERE lower(cb.name) IN ($names)))"
-fi
+# Status as stored by FTL v6 in queries.status
+BLOCKED="1,4,5,6,7,8,9,10,11,15,16,18"
+PASSED="2,3,12,13,14,17"
 
-EXCLUDE=""
-for x in "${EXCLUDES[@]}"; do
-  x="${x#.}"
-  EXCLUDE+=" AND NOT (q.domain = '$(sql_quote "$x")'
-                      OR q.domain LIKE '%.$(like_quote "$x")' ESCAPE '\\')"
-done
+# Error flag of a forwarded query (reply types as stored in queries.reply_type):
+# SERVFAIL (7), REFUSED (8), NOTIMP (9), or no reply (0) unless dnsmasq merged
+# the query into another in-flight query for the same domain and type that
+# was answered within +/- WINDOW seconds.
+ERR="(q.reply_type IN (7,8,9)
+      OR (q.reply_type = 0 AND NOT EXISTS (
+            SELECT 1 FROM queries q2
+            WHERE q2.domain = q.domain AND q2.type = q.type
+              AND q2.reply_type <> 0
+              AND q2.timestamp BETWEEN q.timestamp - $WINDOW AND q.timestamp + $WINDOW)))"
 
-# Reply types as stored by FTL v6 in queries.reply_type:
-# without -e: answers without error (NOERROR) and NXDOMAIN;
-# with -e:    additionally SERVFAIL (7), REFUSED (8) and NOTIMP (9).
-# Queries without reply (0) and dropped queries (NONE, 12) never have a
-# meaningful reply time and are always excluded.
+# Replies whose time is used: answers without error and NXDOMAIN (with -e
+# also SERVFAIL, REFUSED, NOTIMP). Never: no reply (0) and dropped (NONE, 12).
 if [ "$WITHERR" -eq 1 ]; then
-  REPLY_FILTER="AND q.reply_type IN (1,2,3,4,5,6,7,8,9,10,11,13)"
+  TIMED="q.reply_type IN (1,2,3,4,5,6,7,8,9,10,11,13)"
 else
-  REPLY_FILTER="AND q.reply_type IN (1,2,3,4,5,6,10,11,13)"
+  TIMED="q.reply_type IN (1,2,3,4,5,6,10,11,13)"
 fi
 
-# ---------------------------------------------------------------------------
-# Query
-# ---------------------------------------------------------------------------
-# ev:  forwarded queries (status 2) with reply time in ms
-# rk:  rank of every reply time per period and upstream (for median and P95)
-# agg: statistics per period and upstream
-EV="SELECT $PERIOD AS period,
-           q.forward AS upstream,
-           q.reply_time * 1000.0 AS ms
-    FROM queries q
-    WHERE q.status = 2
-      AND q.forward IS NOT NULL AND q.forward <> ''
-      AND q.reply_time IS NOT NULL
-      $REPLY_FILTER
-      $TIME_FILTER
-      $UPSTREAM_FILTER
-      $QTYPE_FILTER
-      $CLIENT_FILTER
-      $EXCLUDE"
+# Forwarded queries with period, upstream, error flag and reply time
+FWD="SELECT $PERIOD AS period,
+            q.forward AS upstream,
+            q.domain AS domain,
+            CASE WHEN $ERR THEN 1 ELSE 0 END AS err,
+            CASE WHEN $TIMED AND q.reply_time IS NOT NULL
+                 THEN q.reply_time * 1000.0 END AS ms
+     FROM queries q
+     WHERE q.status = 2
+       AND q.forward IS NOT NULL AND q.forward <> ''
+       $COMMON
+       $UPSTREAM_FILTER"
 
-# Statistics over the CTE "$1", partitioned by the columns in "$2"
+# Statistics of the column ms over the CTE $1, per the columns in $2.
+# Produces the CTEs rk_$3 and $3 with: <columns>, n_ms, avg_ms, median_ms,
+# p95_ms, max_ms
 stats() {
-  local src="$1" part="$2"
-  echo "rk AS (
-          SELECT *,
+  local src="$1" part="$2" name="$3"
+  echo "rk_$name AS (
+          SELECT $part, ms,
                  row_number() OVER (PARTITION BY $part ORDER BY ms) AS rn,
                  count(*)     OVER (PARTITION BY $part) AS n
-          FROM $src
+          FROM $src WHERE ms IS NOT NULL
         ),
-        agg AS (
+        $name AS (
           SELECT $part,
-                 max(n) AS queries,
+                 max(n) AS n_ms,
                  avg(ms) AS avg_ms,
                  max(CASE WHEN rn = (n + 1) / 2 THEN ms END) AS median_ms,
                  max(CASE WHEN rn = max(1, CAST(n * 0.95 AS INT)) THEN ms END) AS p95_ms,
                  max(ms) AS max_ms
-          FROM rk
+          FROM rk_$name
           GROUP BY $part
         )"
 }
 
-if [ "$GROUP" = "none" ]; then PERIOD_COL=""; else PERIOD_COL="period AS Period,"; fi
+if [ "$GROUP" = "none" ]; then PCOL=""; else PCOL="period AS Period,"; fi
 
-SQL_ROWS="WITH ev AS ($EV),
-     $(stats ev "period, upstream")
-     SELECT $PERIOD_COL
-            upstream AS Upstream,
-            queries AS Queries,
-            printf('%8.1f', avg_ms) AS Avg,
-            printf('%8.1f', median_ms) AS Median,
-            printf('%8.1f', p95_ms) AS P95,
-            printf('%8.1f', max_ms) AS Max
-     FROM agg
-     ORDER BY $ORDER;"
+run() { pihole-FTL sqlite3 -readonly -box "$DB" "$1"; }
 
-SQL_TOTAL="WITH ev AS ($EV),
-     ev2 AS (SELECT 'all' AS grp, ms FROM ev),
-     $(stats ev2 "grp")
-     SELECT (SELECT count(DISTINCT upstream) FROM ev) AS Upstreams,
-            queries AS Queries,
-            printf('%8.1f', avg_ms) AS Avg,
-            printf('%8.1f', median_ms) AS Median,
-            printf('%8.1f', p95_ms) AS P95,
-            printf('%8.1f', max_ms) AS Max
-     FROM agg;"
+# ---------------------------------------------------------------------------
+# Views
+# ---------------------------------------------------------------------------
+show_summary() {
+  local sql="WITH a AS (
+      SELECT $PERIOD AS period, q.status AS status,
+             CASE WHEN q.status = 2 AND $ERR THEN 1 ELSE 0 END AS err,
+             CASE WHEN q.reply_time IS NOT NULL AND q.reply_type NOT IN (0,12)
+                  THEN q.reply_time * 1000.0 END AS ms
+      FROM queries q
+      WHERE 1 = 1 $COMMON
+    ),
+    c AS (
+      SELECT period,
+             count(*) AS total,
+             sum(status IN ($BLOCKED)) AS blocked,
+             sum(status IN ($PASSED)) AS passed,
+             sum(status IN (3,17)) AS cache,
+             sum(status = 17) AS stale,
+             sum(status = 2) AS fwd,
+             sum(status IN (12,13,14)) AS retries,
+             sum(err) AS errors
+      FROM a GROUP BY period
+    ),
+    $(stats a period lat)
+    SELECT ${PCOL//period/c.period}
+           c.total AS Queries,
+           $(pct c.blocked c.total) AS 'Blocked %',
+           $(pct c.cache c.passed) AS 'Cache %',
+           $(pct c.stale c.passed) AS 'Stale %',
+           $(pct c.fwd c.passed) AS 'Fwd %',
+           $(pct c.retries c.passed) AS 'Retries %',
+           $(pct c.errors c.fwd) AS 'Errors %',
+           $(fmt_ms l.avg_ms) AS 'Client avg',
+           $(fmt_ms l.median_ms) AS 'Client median'
+    FROM c LEFT JOIN lat l ON l.period = c.period
+    ORDER BY c.period;"
+  local out
+  out=$(run "$sql") || return 1
+  echo "Overview"
+  [ -n "$out" ] && echo "$out" || echo "No queries match the filters."
+  echo
+}
 
+show_upstreams() {
+  local sql="WITH f AS ($FWD),
+    s AS (
+      SELECT period, upstream, count(*) AS queries, sum(err) AS errors
+      FROM f GROUP BY period, upstream
+    ),
+    p AS (SELECT period, sum(queries) AS fwd FROM s GROUP BY period),
+    $(stats f "period, upstream" t)
+    SELECT ${PCOL//period/s.period}
+           s.upstream AS Upstream,
+           s.queries AS Queries,
+           $(pct s.queries p.fwd) AS 'Share %',
+           $(fmt_ms t.avg_ms) AS Avg,
+           $(fmt_ms t.median_ms) AS Median,
+           $(fmt_ms t.p95_ms) AS P95,
+           $(fmt_ms t.max_ms) AS Max,
+           $(pct s.errors s.queries) AS 'Errors %'
+    FROM s
+    JOIN p ON p.period = s.period
+    LEFT JOIN t ON t.period = s.period AND t.upstream = s.upstream
+    ORDER BY s.period, $SORTKEY, s.upstream;"
+  local out
+  out=$(run "$sql") || return 1
+  echo "Reply time per upstream in ms"
+  if [ -z "$out" ]; then
+    echo "No forwarded queries match the filters."
+    echo
+    return 0
+  fi
+  echo "$out"
+
+  if [ "$NOTOTAL" -eq 0 ]; then
+    sql="WITH f AS ($FWD),
+      f2 AS (SELECT 'all' AS grp, ms FROM f),
+      $(stats f2 grp t)
+      SELECT (SELECT count(DISTINCT upstream) FROM f) AS Upstreams,
+             (SELECT count(*) FROM f) AS Queries,
+             $(fmt_ms t.avg_ms) AS Avg,
+             $(fmt_ms t.median_ms) AS Median,
+             $(fmt_ms t.p95_ms) AS P95,
+             $(fmt_ms t.max_ms) AS Max,
+             $(pct "(SELECT sum(err) FROM f)" "(SELECT count(*) FROM f)") AS 'Errors %'
+      FROM t;"
+    echo "Total"
+    run "$sql" || return 1
+  fi
+  echo
+}
+
+show_histogram() {
+  local sql="WITH f AS ($FWD),
+    h AS (
+      SELECT period, upstream,
+             count(*) AS n,
+             sum(ms < 10) AS b1,
+             sum(ms >= 10 AND ms < 50) AS b2,
+             sum(ms >= 50 AND ms < 100) AS b3,
+             sum(ms >= 100 AND ms < 500) AS b4,
+             sum(ms >= 500) AS b5
+      FROM f WHERE ms IS NOT NULL
+      GROUP BY period, upstream
+    )
+    SELECT $PCOL
+           upstream AS Upstream,
+           n AS Queries,
+           $(pct b1 n) AS '< 10 ms %',
+           $(pct b2 n) AS '10-50 %',
+           $(pct b3 n) AS '50-100 %',
+           $(pct b4 n) AS '100-500 %',
+           $(pct b5 n) AS '>= 500 %'
+    FROM h
+    ORDER BY period, upstream;"
+  local out
+  out=$(run "$sql") || return 1
+  echo "Reply time distribution per upstream"
+  [ -n "$out" ] && echo "$out" || echo "No forwarded queries match the filters."
+  echo
+}
+
+show_top() {
+  local sql="WITH f AS ($FWD),
+    d AS (
+      SELECT domain, count(*) AS queries,
+             group_concat(DISTINCT upstream) AS upstreams
+      FROM f GROUP BY domain
+      HAVING count(*) >= $MINQ
+    ),
+    f2 AS (SELECT f.domain, f.ms FROM f JOIN d ON d.domain = f.domain),
+    $(stats f2 domain t)
+    SELECT d.domain AS Domain,
+           d.queries AS Queries,
+           $(fmt_ms t.median_ms) AS Median,
+           $(fmt_ms t.p95_ms) AS P95,
+           $(fmt_ms t.max_ms) AS Max,
+           d.upstreams AS Upstreams
+    FROM d JOIN t ON t.domain = d.domain
+    ORDER BY t.median_ms DESC, d.queries DESC, d.domain
+    LIMIT $TOPN;"
+  local out
+  out=$(run "$sql") || return 1
+  echo "Slowest $TOPN domains by median reply time in ms (min. $MINQ queries)"
+  [ -n "$out" ] && echo "$out" || echo "No domain has enough forwarded queries."
+  echo
+}
+
+# ---------------------------------------------------------------------------
+# Output
+# ---------------------------------------------------------------------------
 info="$RANGE"
 [ "$GROUP" != "none" ] && info+=", per $GROUP"
 [ ${#QTYPES[@]} -gt 0 ] && info+=", query types: ${QTYPES[*]^^}"
-[ "$WITHERR" -eq 1 ] && info+=", incl. errors"
-echo "Reply time per upstream in ms ($info)"
+[ "$WITHERR" -eq 1 ] && info+=", times incl. errors"
+echo "DNS performance ($info)"
+echo
 
-out=$(pihole-FTL sqlite3 -readonly -box "$DB" "$SQL_ROWS") || exit 1
-if [ -z "$out" ]; then
-  echo "No forwarded queries match the filters."
-  exit 0
-fi
-echo "$out"
-
-if [ "$NOTOTAL" -eq 0 ]; then
-  echo
-  echo "Total"
-  pihole-FTL sqlite3 -readonly -box "$DB" "$SQL_TOTAL" || exit 1
-fi
+rc=0
+[ "$NOSUMMARY" -eq 0 ]   && { show_summary   || rc=1; }
+[ "$NOUPSTREAMS" -eq 0 ] && { show_upstreams || rc=1; }
+[ "$HIST" -eq 1 ]        && { show_histogram || rc=1; }
+[ "$TOPN" -gt 0 ]        && { show_top       || rc=1; }
+exit $rc
