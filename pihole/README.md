@@ -1,6 +1,6 @@
 # Pi-hole FTL database scripts
 
-Three small shell scripts to analyze the Pi-hole v6 query database (`pihole-FTL.db`).
+Small shell scripts to analyze the Pi-hole v6 query database (`pihole-FTL.db`).
 The database is always opened **read-only**, so they are safe to run on a live system.
 
 | Script | Purpose |
@@ -8,6 +8,7 @@ The database is always opened **read-only**, so they are safe to run on a live s
 | `pihole-replycheck.sh` | Find failed replies: SERVFAIL, real "no reply" failures, REFUSED, NXDOMAIN, ... |
 | `pihole-blockrate.sh` | Block rate per client, with a total over all clients |
 | `pihole-domainexport.sh` | Export blocked and/or passed domains to text files |
+| `pihole-upstreamtime.sh` | Reply times per upstream DNS server (avg, median, P95, max) |
 
 ## Requirements
 
@@ -17,11 +18,11 @@ The database is always opened **read-only**, so they are safe to run on a live s
 
 ## Installation
 
-Download and install all three scripts to `/usr/local/bin`:
+Download and install all scripts to `/usr/local/bin`:
 
 ```bash
 URL=https://raw.githubusercontent.com/hagezi/files/refs/heads/main/pihole
-for s in pihole-replycheck pihole-blockrate pihole-domainexport; do
+for s in pihole-replycheck pihole-blockrate pihole-domainexport pihole-upstreamtime; do
   sudo curl -fsSL "$URL/$s.sh" -o "/usr/local/bin/$s" && sudo chmod 755 "/usr/local/bin/$s"
 done
 ```
@@ -90,15 +91,26 @@ Hourly cron job, one hour of overlap so a failed run loses nothing:
 > **Privacy:** `passed.txt` is in effect the browsing history of all clients.
 > Review it before publishing it anywhere, e.g. in a public repository.
 
+## pihole-upstreamtime
+
+Reply time in ms per upstream server, measured by Pi-hole for forwarded queries
+(cache answers are not counted). Error replies are excluded unless `-e` is given.
+
+```bash
+sudo pihole-upstreamtime                        # today, one row per upstream
+sudo pihole-upstreamtime -d 7 -g day            # last 7 days, per day
+sudo pihole-upstreamtime -H 24 -g hour          # last 24 full hours, per hour
+```
+
 ## Common options
 
 | Option | Meaning |
 |---|---|
 | `-d N` / `--from`, `--to` | Time range: last N days or a custom window |
-| `-H N` | Last N full hours (export only) |
+| `-H N` | Last N full hours (export and upstream times) |
 | `-c CLIENT` | Only this client (IP or name), repeatable |
 | `-x DOMAIN` | Exclude a domain incl. subdomains, repeatable |
-| `-q TYPE` | Query types (export and block rate), default `A` and `AAAA` |
+| `-q TYPE` | Query types (export, block rate, upstream times) |
 | `-f FILE` | Other database, e.g. a copy |
 | `-h` / `-V` | Help / version |
 
