@@ -457,7 +457,7 @@ if [ "$GROUP" = "none" ]; then PCOL=""; else PCOL="period AS Period,"; fi
 run() { pihole-FTL sqlite3 -readonly "${SQLITE_FMT[@]}" "$DB" "$1"; }
 
 # Print the result OUT of one view. box: with title (and message if empty),
-# csv: as it is, json: stored in J_<key> for the final object.
+# csv: as it is, json: stored in JSON[<key>] for the final object.
 emit() {
   local key="$1" title="$2" empty="$3"
   case "$FORMAT" in
@@ -467,7 +467,7 @@ emit() {
     csv)
       [ -n "$OUT" ] && echo "$OUT" ;;
     json)
-      printf -v "J_$key" '%s' "${OUT:-[]}" ;;
+      JSON[$key]="${OUT:-[]}" ;;
   esac
 }
 
@@ -555,7 +555,7 @@ show_upstreams() {
     if [ "$FORMAT" = "json" ]; then
       # A single row: unwrap it from the array
       OUT="${OUT#[}"; OUT="${OUT%]}"
-      J_total="${OUT:-null}"
+      JSON[total]="${OUT:-null}"
     else
       echo "Total"
       echo "$OUT"
@@ -644,7 +644,7 @@ view() {
 }
 
 rc=0
-J_overview=""; J_upstreams=""; J_total=""; J_histogram=""; J_top=""
+declare -A JSON=()
 [ "$NOSUMMARY" -eq 0 ]   && { view show_summary   || rc=1; }
 [ "$NOUPSTREAMS" -eq 0 ] && { view show_upstreams || rc=1; }
 [ "$HIST" -eq 1 ]        && { view show_histogram || rc=1; }
@@ -654,8 +654,7 @@ if [ "$FORMAT" = "json" ]; then
   printf '{"from":"%s","to":"%s"' \
     "$(date -d "@$FROM_TS" '+%Y-%m-%d %H:%M:%S')" "$(date -d "@$TO_TS" '+%Y-%m-%d %H:%M:%S')"
   for k in overview upstreams total histogram top; do
-    v="J_$k"
-    [ -n "${!v}" ] && printf ',"%s":%s' "$k" "${!v}"
+    [ -n "${JSON[$k]:-}" ] && printf ',"%s":%s' "$k" "${JSON[$k]}"
   done
   printf '}\n'
 fi
