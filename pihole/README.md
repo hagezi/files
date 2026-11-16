@@ -3,12 +3,12 @@
 Small shell scripts to analyze the Pi-hole v6 query database (`pihole-FTL.db`).
 The database is always opened **read-only**, so they are safe to run on a live system.
 
-| Script | Purpose |
-|---|---|
-| `pihole-replycheck.sh` | Find failed replies: SERVFAIL, real "no reply" failures, REFUSED, NXDOMAIN, ... |
-| `pihole-blockrate.sh` | Block rate per client, with a total over all clients |
-| `pihole-domainexport.sh` | Export blocked and/or passed domains to text files |
-| `pihole-upstreamtime.sh` | DNS performance: cache hit rate, errors, client latency, reply times per upstream |
+| Script | Purpose | Documentation |
+|---|---|---|
+| `pihole-replycheck.sh` | Find failed replies: SERVFAIL, real "no reply" failures, REFUSED, NXDOMAIN, ... | [pihole-replycheck.md](pihole-replycheck.md) |
+| `pihole-blockrate.sh` | Block rate per client, with a total over all clients | [pihole-blockrate.md](pihole-blockrate.md) |
+| `pihole-domainexport.sh` | Export blocked and/or passed domains to text files | [pihole-domainexport.md](pihole-domainexport.md) |
+| `pihole-upstreamtime.sh` | DNS performance: cache hit rate, errors, client latency, reply times per upstream | [pihole-upstreamtime.md](pihole-upstreamtime.md) |
 
 ## Requirements
 
@@ -39,6 +39,9 @@ To update, run the same commands again. Check the installed version with `-V`.
 
 Every script has a full help with all options and examples: `-h`.
 
+The reply check, block rate and upstream times can also write CSV or JSON
+(`-F csv`, `-F json`), e.g. for spreadsheets, Grafana or Home Assistant.
+
 ## pihole-replycheck
 
 Shows queries with a given reply type, as a summary per day and domain or as single events.
@@ -47,10 +50,13 @@ real failures remain (unlike "No reply received" in the query log).
 
 ```bash
 sudo pihole-replycheck                          # today, SERVFAIL + NOREPLY
-sudo pihole-replycheck -d 7 -n -m 3             # last 7 days, client names, max. 3 per row
+sudo pihole-replycheck -d 7 -n -m 3             # last 7 days, client names, max. 3 clients/upstreams per row
 sudo pihole-replycheck --from 03:00 --to 03:45 -v
 sudo pihole-replycheck -t REFUSED -x dnscheck.tools
+sudo pihole-replycheck -H 1 -t SERVFAIL --fail-on-results   # exit 2 if found, for cron/monitoring
 ```
+
+Full documentation: [pihole-replycheck.md](pihole-replycheck.md)
 
 ## pihole-blockrate
 
@@ -61,6 +67,8 @@ sudo pihole-blockrate                           # all data, sorted by name
 sudo pihole-blockrate -s rate                   # highest block rate first
 sudo pihole-blockrate -d 7 -s blocked -l 10     # top 10 by blocked queries
 ```
+
+Full documentation: [pihole-blockrate.md](pihole-blockrate.md)
 
 ## pihole-domainexport
 
@@ -91,6 +99,8 @@ Hourly cron job, one hour of overlap so a failed run loses nothing:
 > **Privacy:** `passed.txt` is in effect the browsing history of all clients.
 > Review it before publishing it anywhere, e.g. in a public repository.
 
+Full documentation: [pihole-domainexport.md](pihole-domainexport.md)
+
 ## pihole-upstreamtime
 
 DNS performance indicators, for the whole time range or per day or hour:
@@ -111,15 +121,18 @@ sudo pihole-upstreamtime -H 24 -g hour -b       # last 24 full hours, with histo
 sudo pihole-upstreamtime -d 7 -t 20 -m 10       # 20 slowest domains, min. 10 queries
 ```
 
+Full documentation: [pihole-upstreamtime.md](pihole-upstreamtime.md)
+
 ## Common options
 
 | Option | Meaning |
 |---|---|
 | `-d N` / `--from`, `--to` | Time range: last N days or a custom window |
-| `-H N` | Last N full hours (export and upstream times) |
+| `-H N` | Last N full hours |
 | `-c CLIENT` | Only this client (IP or name), repeatable |
 | `-x DOMAIN` | Exclude a domain incl. subdomains, repeatable |
 | `-q TYPE` | Query types (export, block rate, upstream times) |
+| `-F FORMAT` | Output as `box` (table), `csv` or `json` (reply check, block rate, upstream times) |
 | `-f FILE` | Other database, e.g. a copy |
 | `-h` / `-V` | Help / version |
 

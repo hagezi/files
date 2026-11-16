@@ -32,7 +32,11 @@
 # Usage:
 #   sudo pihole-domainexport -o DIR [options]   (run with -h for all options and examples)
 
-VERSION="1.0.0"
+VERSION="1.0.1"
+
+# Byte-wise sorting, so the files have the same order regardless of the locale
+# (interactive shell, sudo or cron) and diffs between runs stay small
+export LC_ALL=C
 
 # ---------------------------------------------------------------------------
 # Defaults
@@ -210,6 +214,7 @@ Privacy:
 Notes:
   - Needs read access to the database, so usually run with sudo.
   - Files are written atomically: a crash never leaves a half-written file.
+    Files are sorted byte-wise (LC_ALL=C), independent of the locale.
   - Hourly cron job: with -H 1 every query is exported exactly once, as each
     run covers the hour before it, e.g. "5 * * * *". -H 2 adds one hour of
     overlap, so a single failed or skipped run does not lose any queries;
@@ -229,6 +234,13 @@ EOF
 }
 
 die() { echo "$(basename "$0"): $*" >&2; exit 1; }
+
+# Temporary files of the running export, removed on exit or interrupt
+NEW_TMP=""
+OUT_TMP=""
+cleanup() { rm -f -- "$NEW_TMP" "$OUT_TMP"; }
+trap cleanup EXIT
+trap 'exit 1' INT TERM HUP
 
 # ---------------------------------------------------------------------------
 # Parse arguments
@@ -437,30 +449,28 @@ export_category() {
                $DOMAIN_FILTER;"
 
   local target="$OUTDIR/${FILE[$cat]}"
-  local new tmp
-  new=$(mktemp) || return 1
-  tmp=$(mktemp "$OUTDIR/.${FILE[$cat]}.XXXXXX") || { rm -f "$new"; return 1; }
+  NEW_TMP=$(mktemp) || return 1
+  OUT_TMP=$(mktemp "$OUTDIR/.${FILE[$cat]}.XXXXXX") || return 1
 
-  if ! pihole-FTL sqlite3 -readonly -list "$DB" "$sql" > "$new"; then
-    rm -f "$new" "$tmp"
-    return 1
-  fi
+  pihole-FTL sqlite3 -readonly -list "$DB" "$sql" > "$NEW_TMP" || return 1
 
   local before=0 found total added
-  found=$(count_lines "$new")
+  found=$(count_lines "$NEW_TMP")
   if [ "$OVERWRITE" -eq 0 ] && [ -f "$target" ]; then
     before=$(count_lines "$target")
-    sort -u "$target" "$new" | grep . > "$tmp"
+    sort -u "$target" "$NEW_TMP" | grep . > "$OUT_TMP"
   else
-    sort -u "$new" | grep . > "$tmp"
+    sort -u "$NEW_TMP" | grep . > "$OUT_TMP"
   fi
-  total=$(count_lines "$tmp")
+  total=$(count_lines "$OUT_TMP")
   if [ "$OVERWRITE" -eq 1 ]; then added=$found; else added=$(( total - before )); fi
 
   # Keep the permissions of an existing file, otherwise world-readable
-  if [ -f "$target" ]; then chmod --reference="$target" "$tmp"; else chmod 644 "$tmp"; fi
-  mv -f "$tmp" "$target" || { rm -f "$new" "$tmp"; return 1; }
-  rm -f "$new"
+  if [ -f "$target" ]; then chmod --reference="$target" "$OUT_TMP"; else chmod 644 "$OUT_TMP"; fi
+  mv -f "$OUT_TMP" "$target" || return 1
+  OUT_TMP=""
+  rm -f -- "$NEW_TMP"
+  NEW_TMP=""
 
   [ "$QUIET" -eq 0 ] && printf '  %-9s %7d found  %7d new  %7d total  %s\n' \
     "$cat" "$found" "$added" "$total" "$target"
@@ -475,7 +485,10 @@ fi
 
 rc=0
 for k in "${SELECTED[@]}"; do
-  export_category "$k" || { echo "$(basename "$0"): export of $k failed" >&2; rc=1; }
+  if ! export_category "$k"; then
+    echo "$(basename "$0"): export of $k failed" >&2
+    rc=1
+    cleanup; NEW_TMP=""; OUT_TMP=""
+  fi
 done
 exit $rc
-

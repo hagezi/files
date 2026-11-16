@@ -33,7 +33,7 @@
 # Usage:
 #   sudo pihole-upstreamtime [options]      (run with -h for all options and examples)
 
-VERSION="1.1.0"
+VERSION="1.2.0"
 
 # ---------------------------------------------------------------------------
 # Defaults
@@ -53,6 +53,7 @@ NOSUMMARY=0
 NOUPSTREAMS=0
 NOTOTAL=0
 WITHERR=0
+FORMAT="box"
 QTYPES=()
 EXCLUDES=()
 CLIENTS=()
@@ -112,6 +113,8 @@ Output:
                           median, p95, max or errors. upstream sorts ascending,
                           avg fastest first, the others largest first.
                           Default: $SORT
+  -F, --format FORMAT     box (table), csv or json. Default: $FORMAT
+                          See "Formats" below.
 
 Other:
   -w, --window SEC        Duplicate window for unanswered queries in seconds,
@@ -149,6 +152,14 @@ Errors:
   for the same domain and type that was answered within the duplicate window
   (these are shown as "No reply received" in the Pi-hole query log).
 
+Formats:
+  box       Tables for reading, one per view, with a title line
+  csv       One view only: select it with --no-summary, --no-upstreams, -b
+            or -t (e.g. --no-summary for the upstreams). Without the total.
+  json      {"from": ..., "to": ..., "overview": [...], "upstreams": [...],
+            "total": {...}, "histogram": [...], "top": [...]}, only the
+            selected views. Numbers without padding, null if not available.
+
 Query types:
   A AAAA ANY SRV SOA PTR TXT NAPTR MX DS RRSIG DNSKEY NS OTHER SVCB HTTPS
 
@@ -166,6 +177,9 @@ Examples:
   $me --from "today 18:00" --to "today 22:00"
   # Only A and AAAA queries of one client, one upstream
   $me -q A -q AAAA -c laptop -u 127.0.0.1#5335
+  # Upstreams of the last hour as CSV, everything as JSON
+  $me -H 1 --no-summary -F csv > upstreams.csv
+  $me -H 1 -b -t 10 -F json > dns-performance.json
   # Use a copy of the database
   sudo cp $DB /tmp/ftl-copy.db
   $me -f /tmp/ftl-copy.db -d 30
@@ -177,8 +191,10 @@ Notes:
     hits pull the average down; the median and P95 are more meaningful then.
     Times of the servers behind a local resolver are only known to that
     resolver (Unbound: unbound-control dump_infra).
-  - FTL writes to the database once per minute, the last minute may be
-    missing. Long time ranges can take a while on a Raspberry Pi.
+  - FTL writes to the database only once per minute. Queries of the last
+    2 minutes are ignored because their reply may not be stored yet (they
+    would be counted as errors without reply).
+  - Long time ranges can take a while on a Raspberry Pi.
 
 Exit status:
   0  success (also if there are no results)
@@ -213,6 +229,7 @@ while [ $# -gt 0 ]; do
     --no-total)       NOTOTAL=1; shift ;;
     -g|--group)       GROUP="${2:?Period missing}"; shift 2 ;;
     -s|--sort)        SORT="${2:?Column missing}"; shift 2 ;;
+    -F|--format)      FORMAT="${2:?Format missing}"; shift 2 ;;
     -w|--window)      WINDOW="${2:?Seconds missing}"; shift 2 ;;
     -f|--db)          DB="${2:?Database path missing}"; shift 2 ;;
     -h|--help)        usage; exit 0 ;;
@@ -237,6 +254,17 @@ n=0
 [ "$HOURS" -gt 0 ] && n=$((n + 1))
 [ -n "$FROM" ] && n=$((n + 1))
 [ "$n" -le 1 ] || die "use only one of -d, -H and --from"
+FORMAT="${FORMAT,,}"
+case "$FORMAT" in
+  box)  SQLITE_FMT=(-box) ;;
+  csv)  SQLITE_FMT=(-csv -header) ;;
+  json) SQLITE_FMT=(-json) ;;
+  *)    die "invalid format: $FORMAT (box, csv, json)" ;;
+esac
+if [ "$FORMAT" = "csv" ]; then
+  views=$(( (1 - NOSUMMARY) + (1 - NOUPSTREAMS) + HIST + (TOPN > 0) ))
+  [ "$views" -eq 1 ] || die "csv needs exactly one view, e.g. --no-summary for the upstreams (or use -F json)"
+fi
 command -v pihole-FTL >/dev/null || die "pihole-FTL not found (Pi-hole v6 required)"
 [ -r "$DB" ]                    || die "database not readable: $DB (try sudo)"
 
@@ -287,23 +315,34 @@ like_quote() {
   sql_quote "$s"
 }
 
-# SQL: percentage of $1 in $2, formatted, "-" if $2 is 0
-pct() { echo "CASE WHEN ($2) > 0 THEN printf('%6.2f', 100.0 * ($1) / ($2)) ELSE '     -' END"; }
+# SQL: percentage of $1 in $2. box: padded, "-" if $2 is 0.
+# csv and json: a plain number, NULL if $2 is 0.
+pct() {
+  if [ "$FORMAT" = "box" ]; then
+    echo "CASE WHEN ($2) > 0 THEN printf('%6.2f', 100.0 * ($1) / ($2)) ELSE '     -' END"
+  else
+    echo "CASE WHEN ($2) > 0 THEN round(100.0 * ($1) / ($2), 2) END"
+  fi
+}
 
-# SQL: milliseconds, formatted
-fmt_ms() { echo "printf('%8.1f', $1)"; }
+# SQL: milliseconds. box: padded, csv and json: a plain number
+fmt_ms() {
+  if [ "$FORMAT" = "box" ]; then echo "printf('%8.1f', $1)"; else echo "round($1, 1)"; fi
+}
 
 # ---------------------------------------------------------------------------
 # Time range
 # ---------------------------------------------------------------------------
+# Upper limit: now minus 2 minutes (the reply may not be stored yet)
+LIMIT_TS=$(( $(date +%s) - 120 ))
+
 if [ -n "$FROM" ]; then
   FROM_TS=$(date -d "$FROM" +%s 2>/dev/null) || die "invalid start time: $FROM"
   if [ -n "$TO" ]; then
     TO_TS=$(date -d "$TO" +%s 2>/dev/null) || die "invalid end time: $TO"
   else
-    TO_TS=$(date +%s)
+    TO_TS=$LIMIT_TS
   fi
-  [ "$FROM_TS" -lt "$TO_TS" ] || die "start time must be before end time"
 elif [ -n "$TO" ]; then
   die "--to requires --from"
 elif [ "$HOURS" -gt 0 ]; then
@@ -313,8 +352,10 @@ elif [ "$HOURS" -gt 0 ]; then
 else
   # "<date> N days ago" form, because GNU date would read "-N days" as a timezone
   FROM_TS=$(date -d "$(date +%F) $((DAYS - 1)) days ago" +%s)
-  TO_TS=$(date +%s)
+  TO_TS=$LIMIT_TS
 fi
+[ "$TO_TS" -gt "$LIMIT_TS" ] && TO_TS=$LIMIT_TS
+[ "$FROM_TS" -lt "$TO_TS" ] || die "start time must be before end time (the last 2 minutes are ignored)"
 RANGE="$(date -d "@$FROM_TS" '+%Y-%m-%d %H:%M') to $(date -d "@$TO_TS" '+%Y-%m-%d %H:%M')"
 
 # ---------------------------------------------------------------------------
@@ -389,6 +430,8 @@ FWD="SELECT $PERIOD AS period,
 # Statistics of the column ms over the CTE $1, per the columns in $2.
 # Produces the CTEs rk_$3 and $3 with: <columns>, n_ms, avg_ms, median_ms,
 # p95_ms, max_ms
+# Median: lower median. P95: nearest rank, i.e. the value at rank ceil(0.95 n),
+# so that at least 95 % of the replies are as fast or faster.
 stats() {
   local src="$1" part="$2" name="$3"
   echo "rk_$name AS (
@@ -402,7 +445,7 @@ stats() {
                  max(n) AS n_ms,
                  avg(ms) AS avg_ms,
                  max(CASE WHEN rn = (n + 1) / 2 THEN ms END) AS median_ms,
-                 max(CASE WHEN rn = max(1, CAST(n * 0.95 AS INT)) THEN ms END) AS p95_ms,
+                 max(CASE WHEN rn = (n * 95 + 99) / 100 THEN ms END) AS p95_ms,
                  max(ms) AS max_ms
           FROM rk_$name
           GROUP BY $part
@@ -411,7 +454,22 @@ stats() {
 
 if [ "$GROUP" = "none" ]; then PCOL=""; else PCOL="period AS Period,"; fi
 
-run() { pihole-FTL sqlite3 -readonly -box "$DB" "$1"; }
+run() { pihole-FTL sqlite3 -readonly "${SQLITE_FMT[@]}" "$DB" "$1"; }
+
+# Print the result OUT of one view. box: with title (and message if empty),
+# csv: as it is, json: stored in J_<key> for the final object.
+emit() {
+  local key="$1" title="$2" empty="$3"
+  case "$FORMAT" in
+    box)
+      echo "$title"
+      [ -n "$OUT" ] && echo "$OUT" || echo "$empty" ;;
+    csv)
+      [ -n "$OUT" ] && echo "$OUT" ;;
+    json)
+      printf -v "J_$key" '%s' "${OUT:-[]}" ;;
+  esac
+}
 
 # ---------------------------------------------------------------------------
 # Views
@@ -451,11 +509,8 @@ show_summary() {
            $(fmt_ms l.median_ms) AS 'Client median'
     FROM c LEFT JOIN lat l ON l.period = c.period
     ORDER BY c.period;"
-  local out
-  out=$(run "$sql") || return 1
-  echo "Overview"
-  [ -n "$out" ] && echo "$out" || echo "No queries match the filters."
-  echo
+  OUT=$(run "$sql") || return 1
+  emit overview "Overview" "No queries match the filters."
 }
 
 show_upstreams() {
@@ -480,17 +535,11 @@ show_upstreams() {
     JOIN p ON p.period = s.period
     LEFT JOIN t ON t.period = s.period AND t.upstream = s.upstream
     ORDER BY s.period, $SORTKEY, s.upstream;"
-  local out
-  out=$(run "$sql") || return 1
-  echo "Reply time per upstream in ms"
-  if [ -z "$out" ]; then
-    echo "No forwarded queries match the filters."
-    echo
-    return 0
-  fi
-  echo "$out"
+  OUT=$(run "$sql") || return 1
+  emit upstreams "Reply time per upstream in ms" "No forwarded queries match the filters."
 
-  if [ "$NOTOTAL" -eq 0 ]; then
+  # Total row: not in csv, and only if there are forwarded queries
+  if [ "$NOTOTAL" -eq 0 ] && [ "$FORMAT" != "csv" ] && [ -n "$OUT" ]; then
     sql="WITH f AS ($FWD),
       f2 AS (SELECT 'all' AS grp, ms FROM f),
       $(stats f2 grp t)
@@ -502,10 +551,16 @@ show_upstreams() {
              $(fmt_ms t.max_ms) AS Max,
              $(pct "(SELECT sum(err) FROM f)" "(SELECT count(*) FROM f)") AS 'Errors %'
       FROM t;"
-    echo "Total"
-    run "$sql" || return 1
+    OUT=$(run "$sql") || return 1
+    if [ "$FORMAT" = "json" ]; then
+      # A single row: unwrap it from the array
+      OUT="${OUT#[}"; OUT="${OUT%]}"
+      J_total="${OUT:-null}"
+    else
+      echo "Total"
+      echo "$OUT"
+    fi
   fi
-  echo
 }
 
 show_histogram() {
@@ -532,21 +587,24 @@ show_histogram() {
            $(pct b5 n) AS '>= 500 %'
     FROM h
     ORDER BY period, upstream;"
-  local out
-  out=$(run "$sql") || return 1
-  echo "Reply time distribution per upstream"
-  [ -n "$out" ] && echo "$out" || echo "No forwarded queries match the filters."
-  echo
+  OUT=$(run "$sql") || return 1
+  emit histogram "Reply time distribution per upstream" "No forwarded queries match the filters."
 }
 
 show_top() {
   local sql
   sql="WITH f AS ($FWD),
     d AS (
-      SELECT domain, count(*) AS queries,
-             group_concat(DISTINCT upstream) AS upstreams
+      SELECT domain, count(*) AS queries
       FROM f GROUP BY domain
       HAVING count(*) >= $MINQ
+    ),
+    du AS (
+      SELECT domain, group_concat(upstream, ',') AS upstreams
+      FROM (SELECT DISTINCT f.domain, f.upstream
+            FROM f JOIN d ON d.domain = f.domain
+            ORDER BY f.domain, f.upstream)
+      GROUP BY domain
     ),
     f2 AS (SELECT f.domain, f.ms FROM f JOIN d ON d.domain = f.domain),
     $(stats f2 domain t)
@@ -555,30 +613,50 @@ show_top() {
            $(fmt_ms t.median_ms) AS Median,
            $(fmt_ms t.p95_ms) AS P95,
            $(fmt_ms t.max_ms) AS Max,
-           d.upstreams AS Upstreams
-    FROM d JOIN t ON t.domain = d.domain
+           du.upstreams AS Upstreams
+    FROM d
+    JOIN t ON t.domain = d.domain
+    JOIN du ON du.domain = d.domain
     ORDER BY t.median_ms DESC, d.queries DESC, d.domain
     LIMIT $TOPN;"
-  local out
-  out=$(run "$sql") || return 1
-  echo "Slowest $TOPN domains by median reply time in ms (min. $MINQ queries)"
-  [ -n "$out" ] && echo "$out" || echo "No domain has enough forwarded queries."
-  echo
+  OUT=$(run "$sql") || return 1
+  emit top "Slowest $TOPN domains by median reply time in ms (min. $MINQ queries)" \
+       "No domain has enough forwarded queries."
 }
 
 # ---------------------------------------------------------------------------
 # Output
 # ---------------------------------------------------------------------------
-info="$RANGE"
-[ "$GROUP" != "none" ] && info+=", per $GROUP"
-[ ${#QTYPES[@]} -gt 0 ] && info+=", query types: ${QTYPES[*]^^}"
-[ "$WITHERR" -eq 1 ] && info+=", times incl. errors"
-echo "DNS performance ($info)"
-echo
+if [ "$FORMAT" = "box" ]; then
+  info="$RANGE"
+  [ "$GROUP" != "none" ] && info+=", per $GROUP"
+  [ ${#QTYPES[@]} -gt 0 ] && info+=", query types: ${QTYPES[*]^^}"
+  [ "$WITHERR" -eq 1 ] && info+=", times incl. errors"
+  echo "DNS performance ($info)"
+  echo
+fi
+
+# Run one view; in box format followed by an empty line
+view() {
+  "$1" || return 1
+  [ "$FORMAT" = "box" ] && echo
+  return 0
+}
 
 rc=0
-[ "$NOSUMMARY" -eq 0 ]   && { show_summary   || rc=1; }
-[ "$NOUPSTREAMS" -eq 0 ] && { show_upstreams || rc=1; }
-[ "$HIST" -eq 1 ]        && { show_histogram || rc=1; }
-[ "$TOPN" -gt 0 ]        && { show_top       || rc=1; }
+J_overview=""; J_upstreams=""; J_total=""; J_histogram=""; J_top=""
+[ "$NOSUMMARY" -eq 0 ]   && { view show_summary   || rc=1; }
+[ "$NOUPSTREAMS" -eq 0 ] && { view show_upstreams || rc=1; }
+[ "$HIST" -eq 1 ]        && { view show_histogram || rc=1; }
+[ "$TOPN" -gt 0 ]        && { view show_top       || rc=1; }
+
+if [ "$FORMAT" = "json" ]; then
+  printf '{"from":"%s","to":"%s"' \
+    "$(date -d "@$FROM_TS" '+%Y-%m-%d %H:%M:%S')" "$(date -d "@$TO_TS" '+%Y-%m-%d %H:%M:%S')"
+  for k in overview upstreams total histogram top; do
+    v="J_$k"
+    [ -n "${!v}" ] && printf ',"%s":%s' "$k" "${!v}"
+  done
+  printf '}\n'
+fi
 exit $rc

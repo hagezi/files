@@ -31,13 +31,14 @@
 # Usage:
 #   sudo pihole-blockrate [options]      (run with -h for all options and examples)
 
-VERSION="1.0.0"
+VERSION="1.1.0"
 
 # ---------------------------------------------------------------------------
 # Defaults
 # ---------------------------------------------------------------------------
 DB="/etc/pihole/pihole-FTL.db"
 DAYS=0
+HOURS=0
 FROM=""
 TO=""
 SORT="name"
@@ -45,6 +46,7 @@ REVERSE=0
 MIN=100
 LIMIT=0
 NOTOTAL=0
+FORMAT="box"
 QTYPES=()
 EXCLUDES=()
 CLIENTS=()
@@ -60,10 +62,12 @@ Usage: $me [options]
 Without options: all data in the database, A and AAAA queries, clients with
 at least $MIN queries, sorted by client name. The database is opened read-only.
 
-Time range (default: all data in the database):
+Time range (default: all data in the database; -H and --from override -d):
   -d, --days N            Number of days, counted from today 00:00
                           (1 = today, 2 = today + yesterday, ...)
-      --from TIME         Start of the time range. Overrides -d.
+  -H, --hours N           The last N full hours, ending at the start of the
+                          current hour (e.g. 1 at 10:05 = 09:00 to 10:00)
+      --from TIME         Start of the time range.
       --to TIME           End of the time range (requires --from).
                           Default: now
                           TIME is anything GNU date understands, e.g.
@@ -85,6 +89,10 @@ Output:
   -r, --reverse           Reverse the sort order
   -l, --limit N           Show only the first N clients (0 = all). Default: $LIMIT
       --no-total          Do not show the total over all clients
+  -F, --format FORMAT     box (table), csv or json. Default: $FORMAT
+                          csv: only the client rows, without the total
+                          json: {"from": ..., "to": ..., "clients": [...],
+                          "total": {...}}, numbers without padding
 
 Other:
   -f, --db FILE           Path to the FTL database.
@@ -119,8 +127,13 @@ Examples:
   $me -q ALL -m 0 -s ip
   # Two clients, without a noisy domain
   $me -c laptop -c phone -x example.com
+  # The last 24 full hours
+  $me -H 24 -s rate
   # A time window of yesterday
   $me --from "yesterday 18:00" --to "yesterday 23:59"
+  # Export as CSV or JSON
+  $me -d 7 -F csv > blockrate.csv
+  $me -d 7 -F json > blockrate.json
   # Use a copy of the database
   sudo cp $DB /tmp/ftl-copy.db
   $me -f /tmp/ftl-copy.db
@@ -129,6 +142,8 @@ Notes:
   - Needs read access to the database, so usually run with sudo.
   - The total row covers all clients that match the filters, including
     clients hidden by --min or --limit.
+  - FTL writes to the database only once per minute. Queries of the last
+    2 minutes are ignored because their status may not be stored yet.
 
 Exit status:
   0  success (also if there are no results)
@@ -146,6 +161,7 @@ die() { echo "$(basename "$0"): $*" >&2; exit 1; }
 while [ $# -gt 0 ]; do
   case "$1" in
     -d|--days)    DAYS="${2:?Number of days missing}"; shift 2 ;;
+    -H|--hours)   HOURS="${2:?Number of hours missing}"; shift 2 ;;
     --from)       FROM="${2:?Start time missing}"; shift 2 ;;
     --to)         TO="${2:?End time missing}"; shift 2 ;;
     -q|--qtype)   QTYPES+=("${2:?Query type missing}"); shift 2 ;;
@@ -156,6 +172,7 @@ while [ $# -gt 0 ]; do
     -r|--reverse) REVERSE=1; shift ;;
     -l|--limit)   LIMIT="${2:?Number of clients missing}"; shift 2 ;;
     --no-total)   NOTOTAL=1; shift ;;
+    -F|--format)  FORMAT="${2:?Format missing}"; shift 2 ;;
     -f|--db)      DB="${2:?Database path missing}"; shift 2 ;;
     -h|--help)    usage; exit 0 ;;
     -V|--version) echo "$(basename "$0") $VERSION"
@@ -170,6 +187,15 @@ done
 # Validate input and environment
 # ---------------------------------------------------------------------------
 [[ "$DAYS" =~ ^[0-9]+$ ]]        || die "invalid number of days: $DAYS"
+[[ "$HOURS" =~ ^[0-9]+$ ]]       || die "invalid number of hours: $HOURS"
+[ "$HOURS" -gt 0 ] && [ -n "$FROM" ] && die "use only one of -H and --from"
+FORMAT="${FORMAT,,}"
+case "$FORMAT" in
+  box)  SQLITE_FMT=(-box) ;;
+  csv)  SQLITE_FMT=(-csv -header) ;;
+  json) SQLITE_FMT=(-json) ;;
+  *)    die "invalid format: $FORMAT (box, csv, json)" ;;
+esac
 [[ "$MIN" =~ ^[0-9]+$ ]]         || die "invalid minimum: $MIN"
 [[ "$LIMIT" =~ ^[0-9]+$ ]]       || die "invalid limit: $LIMIT"
 command -v pihole-FTL >/dev/null  || die "pihole-FTL not found (Pi-hole v6 required)"
@@ -178,9 +204,12 @@ command -v pihole-FTL >/dev/null  || die "pihole-FTL not found (Pi-hole v6 requi
 # Sort column. Text columns (name, ip) sort ascending, number columns
 # (total, blocked, passed, rate) descending, i.e. the largest value first.
 # -r reverses the primary key; the client name stays the ascending tiebreaker.
-# IPv4 addresses are sorted numerically, IPv6 after IPv4.
+# IPv4 addresses are sorted numerically, IPv6 after IPv4. With name, clients
+# without a name always come last.
+PREFIX=""
 case "${SORT,,}" in
-  name)    KEYS=("lower(r.Name)" "r.ipkey");    DIR=ASC ;;
+  name)    KEYS=("lower(r.Name)" "r.ipv6" "r.ipkey"); DIR=ASC
+           PREFIX="(r.Name = '') ASC, " ;;
   ip)      KEYS=("r.ipv6" "r.ipkey" "r.IP");    DIR=ASC ;;
   total)   KEYS=("r.Total");                     DIR=DESC ;;
   blocked) KEYS=("r.Blocked");                   DIR=DESC ;;
@@ -191,8 +220,12 @@ esac
 if [ "$REVERSE" -eq 1 ]; then
   [ "$DIR" = ASC ] && DIR=DESC || DIR=ASC
 fi
-ORDER=""
-for k in "${KEYS[@]}"; do ORDER+="${ORDER:+, }$k $DIR"; done
+ORDER="$PREFIX"
+first=1
+for k in "${KEYS[@]}"; do
+  [ "$first" -eq 1 ] || ORDER+=", "
+  ORDER+="$k $DIR"; first=0
+done
 ORDER+=", lower(r.Name) ASC"
 
 # Query types as stored by FTL v6 in queries.type
@@ -224,25 +257,43 @@ like_quote() {
 # ---------------------------------------------------------------------------
 # Time range
 # ---------------------------------------------------------------------------
-TIME_FILTER=""
-RANGE="all data"
+# Upper limit: now minus 2 minutes (the status may not be stored yet)
+LIMIT_TS=$(( $(date +%s) - 120 ))
+SINCE=""
 if [ -n "$FROM" ]; then
-  FROM_TS=$(date -d "$FROM" +%s 2>/dev/null) || die "invalid start time: $FROM"
+  SINCE=$(date -d "$FROM" +%s 2>/dev/null) || die "invalid start time: $FROM"
   if [ -n "$TO" ]; then
-    TO_TS=$(date -d "$TO" +%s 2>/dev/null) || die "invalid end time: $TO"
+    UNTIL=$(date -d "$TO" +%s 2>/dev/null) || die "invalid end time: $TO"
   else
-    TO_TS=$(date +%s)
+    UNTIL=$LIMIT_TS
   fi
-  [ "$FROM_TS" -lt "$TO_TS" ] || die "start time must be before end time"
-  TIME_FILTER="AND q.timestamp >= $FROM_TS AND q.timestamp < $TO_TS"
-  RANGE="$(date -d "@$FROM_TS" '+%Y-%m-%d %H:%M:%S') to $(date -d "@$TO_TS" '+%Y-%m-%d %H:%M:%S')"
 elif [ -n "$TO" ]; then
   die "--to requires --from"
-elif [ "$DAYS" -gt 0 ]; then
+elif [ "$HOURS" -gt 0 ]; then
+  # End: start of the current hour, start: N hours earlier
+  UNTIL=$(date -d "$(date '+%F %H:00:00')" +%s)
+  SINCE=$(( UNTIL - HOURS * 3600 ))
+else
+  UNTIL=$LIMIT_TS
   # "<date> N days ago" form, because GNU date would read "-N days" as a timezone
-  SINCE=$(date -d "$(date +%F) $((DAYS - 1)) days ago" +%s)
-  TIME_FILTER="AND q.timestamp >= $SINCE"
+  [ "$DAYS" -gt 0 ] && SINCE=$(date -d "$(date +%F) $((DAYS - 1)) days ago" +%s)
+fi
+[ "$UNTIL" -gt "$LIMIT_TS" ] && UNTIL=$LIMIT_TS
+if [ -n "$SINCE" ]; then
+  [ "$SINCE" -lt "$UNTIL" ] || die "start time must be before end time (the last 2 minutes are ignored)"
+  TIME_FILTER="AND q.timestamp >= $SINCE AND q.timestamp < $UNTIL"
+  RANGE_FROM=$(date -d "@$SINCE" '+%Y-%m-%d %H:%M:%S')
+else
+  TIME_FILTER="AND q.timestamp < $UNTIL"
+  RANGE_FROM=""
+fi
+RANGE_TO=$(date -d "@$UNTIL" '+%Y-%m-%d %H:%M:%S')
+if [ -n "$FROM" ] || [ "$HOURS" -gt 0 ]; then
+  RANGE="$RANGE_FROM to $RANGE_TO"
+elif [ "$DAYS" -gt 0 ]; then
   RANGE="last $DAYS day(s)"
+else
+  RANGE="all data"
 fi
 
 # ---------------------------------------------------------------------------
@@ -288,6 +339,11 @@ EV="SELECT q.client AS client,
       $CLIENT_FILTER
       $EXCLUDE"
 
+# Rate column: padded for box, a plain number for csv and json
+rate() {
+  if [ "$FORMAT" = "box" ]; then echo "printf('%6.2f', $1)"; else echo "$1"; fi
+}
+
 LIMIT_SQL=""
 [ "$LIMIT" -gt 0 ] && LIMIT_SQL="LIMIT $LIMIT"
 
@@ -319,7 +375,7 @@ SQL_CLIENTS="WITH ev AS ($EV),
               END AS ipkey
        FROM per p
      )
-     SELECT r.IP, r.Name, r.Total, r.Blocked, r.Passed, printf('%6.2f', r.Rate) AS Rate
+     SELECT r.IP, r.Name, r.Total, r.Blocked, r.Passed, $(rate r.Rate) AS Rate
      FROM rows r
      ORDER BY $ORDER
      $LIMIT_SQL;"
@@ -329,21 +385,39 @@ SQL_TOTAL="WITH ev AS ($EV)
             count(*) AS Total,
             sum(b) AS Blocked,
             count(*) - sum(b) AS Passed,
-            printf('%6.2f', 100.0 * sum(b) / count(*)) AS Rate
+            $(rate "round(100.0 * sum(b) / count(*), 2)") AS Rate
      FROM ev
      HAVING count(*) > 0;"
 
-echo "Block rate per client ($RANGE, query types: ${QTYPES[*]^^}, min. $MIN queries)"
-out=$(pihole-FTL sqlite3 -readonly -box "$DB" "$SQL_CLIENTS") || exit 1
-if [ -z "$out" ]; then
-  echo "No clients match the filters."
-  exit 0
-fi
-echo "$out"
+run() { pihole-FTL sqlite3 -readonly "${SQLITE_FMT[@]}" "$DB" "$1"; }
 
-if [ "$NOTOTAL" -eq 0 ]; then
-  echo
-  echo "Total"
-  pihole-FTL sqlite3 -readonly -box "$DB" "$SQL_TOTAL" || exit 1
+clients=$(run "$SQL_CLIENTS") || exit 1
+total=""
+if [ "$NOTOTAL" -eq 0 ] && [ "$FORMAT" != "csv" ]; then
+  total=$(run "$SQL_TOTAL") || exit 1
 fi
 
+case "$FORMAT" in
+  box)
+    echo "Block rate per client ($RANGE, query types: ${QTYPES[*]^^}, min. $MIN queries)"
+    if [ -z "$clients" ]; then
+      echo "No clients match the filters."
+    else
+      echo "$clients"
+    fi
+    if [ "$NOTOTAL" -eq 0 ]; then
+      echo
+      echo "Total"
+      [ -n "$total" ] && echo "$total" || echo "No queries match the filters."
+    fi ;;
+  csv)
+    [ -n "$clients" ] && echo "$clients" ;;
+  json)
+    # The total is a single row: unwrap it from the array
+    total="${total#[}"; total="${total%]}"
+    from="null"; [ -n "$RANGE_FROM" ] && from="\"$RANGE_FROM\""
+    printf '{"from":%s,"to":"%s","clients":%s' "$from" "$RANGE_TO" "${clients:-[]}"
+    [ "$NOTOTAL" -eq 0 ] && printf ',"total":%s' "${total:-null}"
+    printf '}\n' ;;
+esac
+exit 0

@@ -30,17 +30,20 @@
 # Usage:
 #   sudo pihole-replycheck [options]      (run with -h for all options and examples)
 
-VERSION="1.0.0"
+VERSION="1.2.0"
 
 # ---------------------------------------------------------------------------
 # Defaults
 # ---------------------------------------------------------------------------
 DB="/etc/pihole/pihole-FTL.db"
 DAYS=1
+HOURS=0
 WINDOW=10
 VERBOSE=0
 NAMES=0
-MAX_CLIENTS=0
+MAX_ITEMS=0
+FORMAT="box"
+FAIL=0
 FROM=""
 TO=""
 TYPES=()
@@ -58,10 +61,12 @@ Usage: $me [options]
 Without options: today, types SERVFAIL and NOREPLY, summary per day and domain.
 The database is opened read-only.
 
-Time range (use -d or --from/--to):
+Time range (default: -d 1; -H and --from override -d):
   -d, --days N            Number of days, counted from today 00:00
                           (1 = today, 2 = today + yesterday, ...). Default: $DAYS
-      --from TIME         Start of the time range. Overrides -d.
+  -H, --hours N           The last N full hours, ending at the start of the
+                          current hour (e.g. 1 at 10:05 = 09:00 to 10:00)
+      --from TIME         Start of the time range.
       --to TIME           End of the time range (requires --from).
                           Default: now
                           TIME is anything GNU date understands, e.g.
@@ -78,8 +83,13 @@ Filters:
 Output:
   -n, --names             Show client names instead of IP addresses
   -v, --verbose           List every single event instead of a summary
-  -m, --max-clients N     Summary only: show at most N clients per row,
-                          the rest as "… (+X)". 0 = show all. Default: $MAX_CLIENTS
+  -m, --max-items N       Summary only: show at most N clients and N upstreams
+                          per row, the rest as "… (+X)". 0 = show all.
+                          Default: $MAX_ITEMS (old name --max-clients still works)
+  -F, --format FORMAT     box (table), csv or json. Default: $FORMAT
+                          csv and json add the column Type, see "Formats" below
+      --fail-on-results   Exit with status 2 if any query was found, e.g. for
+                          cron jobs or monitoring
 
 Other:
   -w, --window SEC        Duplicate window for NOREPLY in seconds. Default: $WINDOW
@@ -104,18 +114,27 @@ Types:
 
 Output columns:
   Summary:  Day, Count, First, Last, Domain, Clients, Upstreams
+            Clients and upstreams are sorted alphabetically.
   Verbose:  Time, Domain, Client, Upstream
   Upstream is the server FTL stored for the query (e.g. 127.0.0.1#5335).
   It is empty if Pi-hole answered the query itself. With the dnsmasq option
   all-servers, FTL stores only one of the queried upstreams.
+
+Formats:
+  box       Tables for reading, one per type, with a title line
+  csv       One table for all types with a header line, Type as first column
+  json      {"from": ..., "to": ..., "results": {"SERVFAIL": [...], ...}}
+            with one array of row objects per type (empty: [])
 
 Examples:
   # Today, SERVFAIL + NOREPLY
   $me
   # Today and yesterday, with client names
   $me -d 2 -n
-  # SERVFAIL of the last 7 days, at most 3 clients per row
+  # SERVFAIL of the last 7 days, at most 3 clients and upstreams per row
   $me -d 7 -t SERVFAIL -m 3
+  # The last 6 full hours
+  $me -H 6
   # Two other reply types
   $me -t REFUSED -t NXDOMAIN
   # Every single event of today
@@ -131,6 +150,12 @@ Examples:
   $me -x dnscheck.tools -x example.com
   # NOREPLY with a wider duplicate window
   $me -t NOREPLY -w 30
+  # Export as CSV or JSON
+  $me -d 7 -F csv > replies.csv
+  $me -d 7 -F json > replies.json
+  # Cron job: mail the SERVFAIL of the last hour, if there are any
+  out=\$($me -H 1 -t SERVFAIL --fail-on-results) ||
+    echo "\$out" | mail -s "Pi-hole SERVFAIL" root
   # Analyze a copy of the database
   sudo cp $DB /tmp/ftl-copy.db
   $me -f /tmp/ftl-copy.db -d 30
@@ -139,12 +164,14 @@ Notes:
   - Needs read access to the database, so usually run with sudo.
   - FTL writes to the database only once per minute. Queries of the last
     2 minutes are ignored because their reply may not be stored yet.
-  - Client names come from the FTL network table (network_addresses).
+  - Client names come from the FTL client table (client_by_id), or the
+    network table (network_addresses) if empty.
   - NOREPLY over many days (e.g. -d 30) can take a while on a Raspberry Pi.
 
 Exit status:
-  0  success (also if there are no results)
+  0  success, also if there are no results
   1  invalid option, unreadable database or database error
+  2  results found (only with --fail-on-results)
 
 Author: HaGeZi. License: GPL-3.0-or-later.
 EOF
@@ -158,6 +185,7 @@ die() { echo "$(basename "$0"): $*" >&2; exit 1; }
 while [ $# -gt 0 ]; do
   case "$1" in
     -d|--days)        DAYS="${2:?Number of days missing}"; shift 2 ;;
+    -H|--hours)       HOURS="${2:?Number of hours missing}"; shift 2 ;;
     --from)           FROM="${2:?Start time missing}"; shift 2 ;;
     --to)             TO="${2:?End time missing}"; shift 2 ;;
     -t|--type)        TYPES+=("${2:?Type missing}"); shift 2 ;;
@@ -165,7 +193,10 @@ while [ $# -gt 0 ]; do
     -x|--exclude)     EXCLUDES+=("${2:?Domain missing}"); shift 2 ;;
     -n|--names)       NAMES=1; shift ;;
     -v|--verbose)     VERBOSE=1; shift ;;
-    -m|--max-clients) MAX_CLIENTS="${2:?Number of clients missing}"; shift 2 ;;
+    -m|--max-items|--max-clients)
+                      MAX_ITEMS="${2:?Number of items missing}"; shift 2 ;;
+    -F|--format)      FORMAT="${2:?Format missing}"; shift 2 ;;
+    --fail-on-results) FAIL=1; shift ;;
     -w|--window)      WINDOW="${2:?Seconds missing}"; shift 2 ;;
     -f|--db)          DB="${2:?Database path missing}"; shift 2 ;;
     -h|--help)        usage; exit 0 ;;
@@ -180,21 +211,37 @@ done
 # ---------------------------------------------------------------------------
 # Validate input and environment
 # ---------------------------------------------------------------------------
-[[ "$DAYS" =~ ^[1-9][0-9]*$ ]]   || die "invalid number of days: $DAYS"
-[[ "$WINDOW" =~ ^[0-9]+$ ]]      || die "invalid window: $WINDOW"
-[[ "$MAX_CLIENTS" =~ ^[0-9]+$ ]] || die "invalid number of clients: $MAX_CLIENTS"
-command -v pihole-FTL >/dev/null  || die "pihole-FTL not found (Pi-hole v6 required)"
-[ -r "$DB" ]                     || die "database not readable: $DB (try sudo)"
+[[ "$DAYS" =~ ^[1-9][0-9]*$ ]]  || die "invalid number of days: $DAYS"
+[[ "$HOURS" =~ ^[0-9]+$ ]]      || die "invalid number of hours: $HOURS"
+[[ "$WINDOW" =~ ^[0-9]+$ ]]     || die "invalid window: $WINDOW"
+[[ "$MAX_ITEMS" =~ ^[0-9]+$ ]]  || die "invalid number of items: $MAX_ITEMS"
+FORMAT="${FORMAT,,}"
+case "$FORMAT" in
+  box)  SQLITE_FMT=(-box) ;;
+  csv)  SQLITE_FMT=(-csv -header) ;;
+  json) SQLITE_FMT=(-json) ;;
+  *)    die "invalid format: $FORMAT (box, csv, json)" ;;
+esac
+[ "$HOURS" -gt 0 ] && [ -n "$FROM" ] && die "use only one of -H and --from"
+command -v pihole-FTL >/dev/null || die "pihole-FTL not found (Pi-hole v6 required)"
+[ -r "$DB" ]                    || die "database not readable: $DB (try sudo)"
 
 [ ${#TYPES[@]} -eq 0 ] && TYPES=(SERVFAIL NOREPLY)
 
-# Validate all types before running any query
+# Validate all types before running any query; uppercase, without duplicates
+declare -A SEEN=()
+UTYPES=()
 for t in "${TYPES[@]}"; do
-  case "${t^^}" in
+  t="${t^^}"
+  case "$t" in
     NOREPLY|UNKNOWN|NODATA|NXDOMAIN|SERVFAIL|REFUSED|NOTIMP|NONE) ;;
     *) die "unknown type: $t (help: -h)" ;;
   esac
+  [ -n "${SEEN[$t]:-}" ] && continue
+  SEEN[$t]=1
+  UTYPES+=("$t")
 done
+TYPES=("${UTYPES[@]}")
 
 # Escape single quotes for use inside SQL string literals
 sql_quote() { printf '%s' "${1//\'/\'\'}"; }
@@ -213,39 +260,52 @@ like_quote() {
 LIMIT_TS=$(( $(date +%s) - 120 ))
 
 if [ -n "$FROM" ]; then
-  FROM_TS=$(date -d "$FROM" +%s 2>/dev/null) || die "invalid start time: $FROM"
+  SINCE=$(date -d "$FROM" +%s 2>/dev/null) || die "invalid start time: $FROM"
   if [ -n "$TO" ]; then
-    TO_TS=$(date -d "$TO" +%s 2>/dev/null) || die "invalid end time: $TO"
+    UNTIL=$(date -d "$TO" +%s 2>/dev/null) || die "invalid end time: $TO"
   else
-    TO_TS=$LIMIT_TS
+    UNTIL=$LIMIT_TS
   fi
-  [ "$TO_TS" -gt "$LIMIT_TS" ] && TO_TS=$LIMIT_TS
-  [ "$FROM_TS" -lt "$TO_TS" ] || die "start time must be before end time"
-  SINCE=$FROM_TS
-  UNTIL=$TO_TS
-  RANGE="$(date -d "@$FROM_TS" '+%Y-%m-%d %H:%M:%S') to $(date -d "@$TO_TS" '+%Y-%m-%d %H:%M:%S')"
+elif [ -n "$TO" ]; then
+  die "--to requires --from"
+elif [ "$HOURS" -gt 0 ]; then
+  # End: start of the current hour, start: N hours earlier
+  UNTIL=$(date -d "$(date '+%F %H:00:00')" +%s)
+  SINCE=$(( UNTIL - HOURS * 3600 ))
 else
-  [ -n "$TO" ] && die "--to requires --from"
   # Today 00:00 local time minus (DAYS-1) days. The "<date> N days ago" form
   # is used because GNU date would read "-N days" after a time as a timezone.
   SINCE=$(date -d "$(date +%F) $((DAYS - 1)) days ago" +%s)
   UNTIL=$LIMIT_TS
+fi
+[ "$UNTIL" -gt "$LIMIT_TS" ] && UNTIL=$LIMIT_TS
+[ "$SINCE" -lt "$UNTIL" ] || die "start time must be before end time (the last 2 minutes are ignored)"
+RANGE_FROM=$(date -d "@$SINCE" '+%Y-%m-%d %H:%M:%S')
+RANGE_TO=$(date -d "@$UNTIL" '+%Y-%m-%d %H:%M:%S')
+if [ -z "$FROM" ] && [ "$HOURS" -eq 0 ]; then
   RANGE="last $DAYS day(s)"
+else
+  RANGE="$RANGE_FROM to $RANGE_TO"
 fi
 
 # ---------------------------------------------------------------------------
 # Building blocks for the SQL queries
 # ---------------------------------------------------------------------------
-# Client shown as IP address or as name from the network table
+# Client shown as IP address or as name from the FTL client table, or the
+# network table if empty (same order as pihole-blockrate)
 if [ "$NAMES" -eq 1 ]; then
-  CLIENT="COALESCE((SELECT na.name FROM network_addresses na
+  CLIENT="COALESCE((SELECT cb.name FROM client_by_id cb
+                    WHERE cb.ip = q.client AND cb.name IS NOT NULL AND cb.name <> ''
+                    LIMIT 1),
+                   (SELECT na.name FROM network_addresses na
                     WHERE na.ip = q.client AND na.name IS NOT NULL AND na.name <> ''
-                    ORDER BY na.lastSeen DESC LIMIT 1), q.client)"
+                    ORDER BY na.lastSeen DESC LIMIT 1),
+                   q.client)"
 else
   CLIENT="q.client"
 fi
 
-# Client filter: match by IP address or by name from the network table
+# Client filter: match by IP address or by name from the client or network table
 CLIENT_FILTER=""
 if [ ${#CLIENTS[@]} -gt 0 ]; then
   ips=""; names=""
@@ -255,7 +315,9 @@ if [ ${#CLIENTS[@]} -gt 0 ]; then
   done
   CLIENT_FILTER="AND (q.client IN ($ips)
                       OR q.client IN (SELECT na.ip FROM network_addresses na
-                                      WHERE lower(na.name) IN ($names)))"
+                                      WHERE lower(na.name) IN ($names))
+                      OR q.client IN (SELECT cb.ip FROM client_by_id cb
+                                      WHERE lower(cb.name) IN ($names)))"
 fi
 
 # Excluded domains: exact match or any subdomain
@@ -269,11 +331,36 @@ done
 # Upstream as stored by FTL (NULL if Pi-hole answered the query itself)
 UPSTREAM="NULLIF(q.forward, '')"
 
+# Two CTEs that build a list of the distinct values of column COL of "ev"
+# per day and domain, sorted and cut after MAX_ITEMS entries (0 = all):
+#   NAME_n: distinct values, numbered (rn) and counted (n)
+#   NAME:   day, domain, items (comma-separated list, rest as "… (+X)")
+list_cte() {
+  local name="$1" col="$2"
+  printf '%s' "${name}_n AS (
+           SELECT day, domain, $col AS item,
+                  row_number() OVER (PARTITION BY day, domain ORDER BY $col) AS rn,
+                  count(*)     OVER (PARTITION BY day, domain) AS n
+           FROM (SELECT DISTINCT day, domain, $col FROM ev WHERE $col IS NOT NULL)
+         ),
+         $name AS (
+           SELECT day, domain,
+                  group_concat(CASE WHEN $MAX_ITEMS = 0 OR rn <= $MAX_ITEMS THEN item END, ',')
+                    || CASE WHEN $MAX_ITEMS > 0 AND max(n) > $MAX_ITEMS
+                            THEN ',… (+' || (max(n) - $MAX_ITEMS) || ')' ELSE '' END AS items
+           FROM (SELECT * FROM ${name}_n ORDER BY day, domain, rn)
+           GROUP BY day, domain
+         )"
+}
+
 # ---------------------------------------------------------------------------
-# Run one query per reply type
+# Query for one reply type, result in OUT
 # ---------------------------------------------------------------------------
 query() {
-  local type="${1^^}" where
+  local type="$1" where typecol=""
+
+  # csv and json: the type as first column
+  [ "$FORMAT" != "box" ] && typecol="'$type' AS Type,"
 
   # Numeric reply types as stored by FTL v6 in queries.reply_type
   case "$type" in
@@ -307,7 +394,8 @@ query() {
 
   local sql
   if [ "$VERBOSE" -eq 1 ]; then
-    sql="SELECT datetime(q.timestamp,'unixepoch','localtime') AS Time,
+    sql="SELECT $typecol
+                datetime(q.timestamp,'unixepoch','localtime') AS Time,
                 q.domain AS Domain,
                 $CLIENT AS Client,
                 $UPSTREAM AS Upstream
@@ -315,8 +403,8 @@ query() {
          ORDER BY q.timestamp;"
   else
     # ev:  matching events
-    # cl:  distinct clients per day and domain, numbered (rn) and counted (n)
-    # cla: client list per day and domain, cut after MAX_CLIENTS entries (0 = all)
+    # cla: client list per day and domain
+    # upa: upstream list per day and domain (no row if Pi-hole answered itself)
     sql="WITH ev AS (
            SELECT date(q.timestamp,'unixepoch','localtime') AS day,
                   q.timestamp AS ts,
@@ -325,48 +413,66 @@ query() {
                   $UPSTREAM AS upstream
            $base
          ),
-         cl AS (
-           SELECT day, domain, client,
-                  row_number() OVER (PARTITION BY day, domain ORDER BY client) AS rn,
-                  count(*)     OVER (PARTITION BY day, domain) AS n
-           FROM (SELECT DISTINCT day, domain, client FROM ev)
-         ),
-         cla AS (
-           SELECT day, domain,
-                  group_concat(CASE WHEN $MAX_CLIENTS = 0 OR rn <= $MAX_CLIENTS THEN client END, ',')
-                    || CASE WHEN $MAX_CLIENTS > 0 AND max(n) > $MAX_CLIENTS
-                            THEN ',… (+' || (max(n) - $MAX_CLIENTS) || ')' ELSE '' END AS clients
-           FROM (SELECT * FROM cl ORDER BY day, domain, rn)
-           GROUP BY day, domain
-         )
-         SELECT e.day AS Day,
+         $(list_cte cla client),
+         $(list_cte upa upstream)
+         SELECT $typecol
+                e.day AS Day,
                 count(*) AS Count,
                 time(min(e.ts),'unixepoch','localtime') AS First,
                 time(max(e.ts),'unixepoch','localtime') AS Last,
                 e.domain AS Domain,
-                c.clients AS Clients,
-                group_concat(DISTINCT e.upstream) AS Upstreams
+                c.items AS Clients,
+                u.items AS Upstreams
          FROM ev e
-         JOIN cla c ON c.day = e.day AND c.domain = e.domain
+         LEFT JOIN cla c ON c.day = e.day AND c.domain = e.domain
+         LEFT JOIN upa u ON u.day = e.day AND u.domain = e.domain
          GROUP BY e.day, e.domain
          ORDER BY e.day, Count DESC, e.domain;"
   fi
 
-  local out
-  out=$(pihole-FTL sqlite3 -readonly -box "$DB" "$sql") || return 1
-
-  if [ -z "$out" ]; then
-    echo "$type: no results ($RANGE)."
-  else
-    echo "$type – $RANGE"
-    echo "$out"
-  fi
-  echo
+  OUT=$(pihole-FTL sqlite3 -readonly "${SQLITE_FMT[@]}" "$DB" "$sql")
 }
 
+# ---------------------------------------------------------------------------
+# Run one query per reply type and print the results
+# ---------------------------------------------------------------------------
 rc=0
+found=0
+header=0
+json=""
 for t in "${TYPES[@]}"; do
-  query "$t" || rc=1
-done
-exit $rc
+  if ! query "$t"; then
+    rc=1
+    continue
+  fi
+  [ -n "$OUT" ] && found=1
 
+  case "$FORMAT" in
+    box)
+      if [ -z "$OUT" ]; then
+        echo "$t: no results ($RANGE)."
+      else
+        echo "$t – $RANGE"
+        echo "$OUT"
+      fi
+      echo ;;
+    csv)
+      # One header line for all types
+      if [ -n "$OUT" ]; then
+        if [ "$header" -eq 0 ]; then
+          echo "$OUT"; header=1
+        else
+          tail -n +2 <<< "$OUT"
+        fi
+      fi ;;
+    json)
+      json+="${json:+,}\"$t\":${OUT:-[]}" ;;
+  esac
+done
+
+[ "$FORMAT" = "json" ] && \
+  printf '{"from":"%s","to":"%s","results":{%s}}\n' "$RANGE_FROM" "$RANGE_TO" "$json"
+
+[ "$rc" -ne 0 ] && exit "$rc"
+[ "$FAIL" -eq 1 ] && [ "$found" -eq 1 ] && exit 2
+exit 0
